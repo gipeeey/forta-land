@@ -24,7 +24,7 @@ const services = [
       <div class="eyebrow" data-reveal>{site.tagline} · Est. {site.founded}</div>
       <h1 class="display h-xxl" style="margin-top:24px;">
         <span class="line-mask" data-reveal><span>We build</span></span>
-        <span class="line-mask" data-reveal data-reveal-delay="1"><span>software <span class="accent">worth</span></span></span>
+        <span class="line-mask" data-reveal data-reveal-delay="1"><span>software <span class="accent mono-em">worth</span></span></span>
         <span class="line-mask" data-reveal data-reveal-delay="2"><span>running.</span></span>
       </h1>
     </div>
@@ -90,27 +90,36 @@ const services = [
     <div style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:24px; margin-bottom:44px;">
       <div>
         <div class="eyebrow" data-reveal>Selected work</div>
-        <h2 class="display h-lg" data-reveal style="margin-top:18px;">Building in public.</h2>
+        <h2 class="display h-lg" data-reveal style="margin-top:18px;">Building <span class="accent mono-em">in public</span>.</h2>
       </div>
-      <span class="mono" data-reveal>(02) — Case studies coming soon</span>
+      <span class="mono" data-reveal>(02) — First case studies, 2026</span>
     </div>
 
-    <div class="grid cols-2">
-      <div class="work-card" data-reveal>
-        <div class="ph"><div class="img-inner"><span class="label">Web App — coming soon</span></div><div class="scrim"></div></div>
-        <div class="meta"><h3>First case study in progress</h3><span class="tags">Web App · Dashboard</span></div>
+    <a href="/contact" class="work-card" data-reveal>
+      <div class="ph" style="aspect-ratio:16/8; border-radius:16px;"><div class="img-inner"><span class="label">In progress</span></div><div class="scrim"></div></div>
+      <div class="meta">
+        <div><h3 style="font-size:clamp(1.5rem,2.8vw,2.3rem);">Our first client engagements are being built right now</h3></div>
+        <span class="tags">Web apps · Systems · Commerce</span>
       </div>
-      <div class="work-card tall" data-reveal data-reveal-delay="1" style="margin-top:64px;">
-        <div class="ph"><div class="img-inner"><span class="label">Systems Integration — coming soon</span></div><div class="scrim"></div></div>
-        <div class="meta"><h3>Second case study in progress</h3><span class="tags">Custom CMS · Integration</span></div>
+    </a>
+
+    <p class="body" data-reveal data-reveal-delay="1" style="max-width:54ch; margin-top:28px;">
+      We launched in {site.founded} and chose to work in the open. Real case studies land
+      here the moment they ship — until then, here's the kind of work we take on.
+    </p>
+
+    <div class="grid cols-3" style="margin-top:56px;">
+      <div class="step" style="border-top-color:var(--line-strong);" data-reveal>
+        <span class="idx">01</span>
+        <div><h3 style="font-size:clamp(1.3rem,2.4vw,1.7rem);">Web apps &amp; dashboards</h3><p>Custom applications and internal tools built around how your team actually works.</p></div>
       </div>
-      <div class="work-card tall" data-reveal>
-        <div class="ph"><div class="img-inner"><span class="label">Website — coming soon</span></div><div class="scrim"></div></div>
-        <div class="meta"><h3>Third case study in progress</h3><span class="tags">Landing Page · SEO</span></div>
+      <div class="step" style="border-top-color:var(--line-strong);" data-reveal data-reveal-delay="1">
+        <span class="idx">02</span>
+        <div><h3 style="font-size:clamp(1.3rem,2.4vw,1.7rem);">Systems &amp; integration</h3><p>Custom CMS, information systems and integrations across the tools you already run.</p></div>
       </div>
-      <div class="work-card" data-reveal data-reveal-delay="1" style="margin-top:64px;">
-        <div class="ph"><div class="img-inner"><span class="label">E-commerce — coming soon</span></div><div class="scrim"></div></div>
-        <div class="meta"><h3>Fourth case study in progress</h3><span class="tags">Online Store</span></div>
+      <div class="step" style="border-top-color:var(--line-strong);" data-reveal data-reveal-delay="2">
+        <span class="idx">03</span>
+        <div><h3 style="font-size:clamp(1.3rem,2.4vw,1.7rem);">Commerce &amp; growth</h3><p>Online stores and the ongoing improvements that keep them converting after launch.</p></div>
       </div>
     </div>
   </section>
