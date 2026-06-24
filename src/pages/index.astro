@@ -3,34 +3,35 @@ import Base from '../layouts/Base.astro';
 import { site } from '../config';
 
 const services = [
-  { n: '01', title: 'Consulting & Audits', desc: "A clear-eyed look at what's holding your site back — performance, conversion, structure — and a plan to fix it." },
-  { n: '02', title: 'Brand & Identity', desc: 'Names, marks, type systems and voice that give your business a face worth remembering.' },
-  { n: '03', title: 'Website Design', desc: 'Custom, content-first design — no templates, no guesswork. Crafted screen by screen.' },
-  { n: '04', title: 'Development & Build', desc: 'Hand-built, blazing-fast front-ends and the CMS your team will actually enjoy using.' },
-  { n: '05', title: 'SEO & Performance', desc: 'Core Web Vitals, technical SEO and analytics so your site is found and stays fast.' },
-  { n: '06', title: 'Care & Growth', desc: 'Ongoing support, iteration and experiments that keep the site improving long after launch.' },
+  { n: '01', title: 'Discovery & Consulting', desc: 'Requirements research and system audits that tell you exactly what needs to be built, before a line of code gets written.' },
+  { n: '02', title: 'Websites & Landing Pages', desc: 'Company profiles and landing pages for startups and growing businesses — fast, content-first, no bloated templates.' },
+  { n: '03', title: 'Web Apps & Dashboards', desc: 'Custom web applications and admin dashboards built around how your team actually works.' },
+  { n: '04', title: 'Systems Integration & Custom Software', desc: 'Custom CMS, sistem informasi, and integrations connecting the tools your business already runs on.' },
+  { n: '05', title: 'E-commerce', desc: 'Online stores with payments, inventory and checkout flows that hold up at scale.' },
+  { n: '06', title: 'Desktop Applications', desc: 'Cross-platform desktop tools for the workflows that don\'t belong in a browser tab.' },
+  { n: '07', title: 'Care & Growth', desc: 'Ongoing support and a steady stream of improvements that keep things running long after launch.' },
 ];
 ---
 
 <Base
-  title={`${site.name} — Digital Studio`}
+  title={`${site.name} — Software Studio`}
   description={site.description}
   mainLabel="Home"
 >
   <!-- HERO -->
   <section class="hero wrap">
     <div class="hero-title">
-      <div class="eyebrow" data-reveal>Digital studio · Est. {site.founded} · Worldwide</div>
+      <div class="eyebrow" data-reveal>{site.tagline} · Est. {site.founded}</div>
       <h1 class="display h-xxl" style="margin-top:24px;">
-        <span class="line-mask" data-reveal><span>We make the</span></span>
-        <span class="line-mask" data-reveal data-reveal-delay="1"><span>web <span class="accent">worth</span></span></span>
-        <span class="line-mask" data-reveal data-reveal-delay="2"><span>visiting.</span></span>
+        <span class="line-mask" data-reveal><span>We build</span></span>
+        <span class="line-mask" data-reveal data-reveal-delay="1"><span>software <span class="accent">worth</span></span></span>
+        <span class="line-mask" data-reveal data-reveal-delay="2"><span>running.</span></span>
       </h1>
     </div>
     <div class="hero-meta">
       <p class="lead" data-reveal data-reveal-delay="2">
-        A studio for brands that refuse to blend in. We consult, design, and build
-        websites that perform as good as they look.
+        A studio for teams that need more than a website — we research, design, build and
+        integrate the systems your business actually runs on.
       </p>
       <div class="scroll-cue mono" data-reveal data-reveal-delay="3">
         <span class="track"></span> Scroll to explore
@@ -41,7 +42,7 @@ const services = [
   <!-- MARQUEE -->
   <div class="marquee" aria-hidden="true">
     <div class="marquee-track">
-      <span>Strategy</span><span>Brand</span><span>Design</span><span>Build</span><span>Motion</span><span>SEO</span>
+      <span>Web Apps</span><span>Systems Integration</span><span>Custom CMS</span><span>Desktop Apps</span><span>E-commerce</span><span>Consulting</span>
     </div>
   </div>
 
@@ -51,9 +52,9 @@ const services = [
       <div class="mono" data-reveal>(01) — What we believe</div>
       <div>
         <p class="display h-md" data-reveal style="line-height:1.18;">
-          Most websites are forgotten the moment they load. We build the
-          other kind — <span class="accent">fast, considered, and unmistakably yours</span>.
-          Every pixel earns its place, every interaction has intent.
+          Most software is a template wearing a different logo. We build the
+          other kind — <span class="accent">fast, considered, and built for what's next</span>.
+          Every screen, every integration earns its place.
         </p>
         <div style="margin-top:48px;" data-reveal data-reveal-delay="1">
           <a href="/about" class="tlink">Meet the studio →</a>
@@ -67,7 +68,7 @@ const services = [
     <div style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:24px; margin-bottom:40px;">
       <div>
         <div class="eyebrow" data-reveal>What we do</div>
-        <h2 class="display h-lg" data-reveal style="margin-top:18px;">Six ways we help.</h2>
+        <h2 class="display h-lg" data-reveal style="margin-top:18px;">Seven ways we help.</h2>
       </div>
       <a href="/services" class="tlink" data-reveal>All services →</a>
     </div>
@@ -89,38 +90,38 @@ const services = [
     <div style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:24px; margin-bottom:44px;">
       <div>
         <div class="eyebrow" data-reveal>Selected work</div>
-        <h2 class="display h-lg" data-reveal style="margin-top:18px;">Recent projects.</h2>
+        <h2 class="display h-lg" data-reveal style="margin-top:18px;">Building in public.</h2>
       </div>
-      <span class="mono" data-reveal>(02) — 2023–2026</span>
+      <span class="mono" data-reveal>(02) — Case studies coming soon</span>
     </div>
 
     <div class="grid cols-2">
-      <a class="work-card" href="#" data-reveal>
-        <div class="ph"><div class="img-inner"><span class="label">Case study — Fintech</span></div><div class="scrim"></div></div>
-        <div class="meta"><h3>Northwind Capital</h3><span class="tags">Brand · Web · 2026</span></div>
-      </a>
-      <a class="work-card tall" href="#" data-reveal data-reveal-delay="1" style="margin-top:64px;">
-        <div class="ph"><div class="img-inner"><span class="label">Case study — DTC</span></div><div class="scrim"></div></div>
-        <div class="meta"><h3>Field & Flora</h3><span class="tags">Design · Build · 2025</span></div>
-      </a>
-      <a class="work-card tall" href="#" data-reveal>
-        <div class="ph"><div class="img-inner"><span class="label">Case study — SaaS</span></div><div class="scrim"></div></div>
-        <div class="meta"><h3>Lumen Analytics</h3><span class="tags">Consulting · SEO · 2025</span></div>
-      </a>
-      <a class="work-card" href="#" data-reveal data-reveal-delay="1" style="margin-top:64px;">
-        <div class="ph"><div class="img-inner"><span class="label">Case study — Hospitality</span></div><div class="scrim"></div></div>
-        <div class="meta"><h3>Casa Ondina</h3><span class="tags">Brand · Web · Motion</span></div>
-      </a>
+      <div class="work-card" data-reveal>
+        <div class="ph"><div class="img-inner"><span class="label">Web App — coming soon</span></div><div class="scrim"></div></div>
+        <div class="meta"><h3>First case study in progress</h3><span class="tags">Web App · Dashboard</span></div>
+      </div>
+      <div class="work-card tall" data-reveal data-reveal-delay="1" style="margin-top:64px;">
+        <div class="ph"><div class="img-inner"><span class="label">Systems Integration — coming soon</span></div><div class="scrim"></div></div>
+        <div class="meta"><h3>Second case study in progress</h3><span class="tags">Custom CMS · Integration</span></div>
+      </div>
+      <div class="work-card tall" data-reveal>
+        <div class="ph"><div class="img-inner"><span class="label">Website — coming soon</span></div><div class="scrim"></div></div>
+        <div class="meta"><h3>Third case study in progress</h3><span class="tags">Landing Page · SEO</span></div>
+      </div>
+      <div class="work-card" data-reveal data-reveal-delay="1" style="margin-top:64px;">
+        <div class="ph"><div class="img-inner"><span class="label">E-commerce — coming soon</span></div><div class="scrim"></div></div>
+        <div class="meta"><h3>Fourth case study in progress</h3><span class="tags">Online Store</span></div>
+      </div>
     </div>
   </section>
 
   <!-- STATS -->
   <section class="section-sm wrap">
     <div class="grid cols-4">
-      <div class="stat" data-reveal><div class="num">120<span class="accent">+</span></div><div class="cap">Sites shipped since {site.founded}</div></div>
-      <div class="stat" data-reveal data-reveal-delay="1"><div class="num">98<span class="accent">/100</span></div><div class="cap">Median Lighthouse performance score</div></div>
-      <div class="stat" data-reveal data-reveal-delay="2"><div class="num">2.4<span class="accent">×</span></div><div class="cap">Average lift in conversion after relaunch</div></div>
-      <div class="stat" data-reveal data-reveal-delay="3"><div class="num">11<span class="accent">yr</span></div><div class="cap">Years crafting for the web</div></div>
+      <div class="stat" data-reveal><div class="num">0<span class="accent"> templates</span></div><div class="cap">Every build starts from your actual problem, not a theme.</div></div>
+      <div class="stat" data-reveal data-reveal-delay="1"><div class="num">100<span class="accent">% senior</span></div><div class="cap">No junior hand-offs — the people who scope it build it.</div></div>
+      <div class="stat" data-reveal data-reveal-delay="2"><div class="num">1<span class="accent"> team</span></div><div class="cap">Design, engineering and systems work under one roof.</div></div>
+      <div class="stat" data-reveal data-reveal-delay="3"><div class="num">&lt;48<span class="accent">hr</span></div><div class="cap">Typical first reply once you reach out.</div></div>
     </div>
   </section>
 
@@ -135,27 +136,20 @@ const services = [
         </p>
       </div>
       <div>
-        <div class="step" data-reveal><span class="idx">01</span><div><h3>Discover</h3><p>We audit what exists, interview your team, and pin down the one job the site must do.</p><div class="tags"><span class="chip">Audit</span><span class="chip">Strategy</span><span class="chip">Research</span></div></div></div>
-        <div class="step" data-reveal><span class="idx">02</span><div><h3>Define</h3><p>Sitemap, narrative and a design language. We agree on direction before a single screen is polished.</p><div class="tags"><span class="chip">Architecture</span><span class="chip">Art direction</span></div></div></div>
-        <div class="step" data-reveal><span class="idx">03</span><div><h3>Design & Build</h3><p>Designed and developed in tight loops — you see real, working pages early and often.</p><div class="tags"><span class="chip">UI design</span><span class="chip">Front-end</span><span class="chip">CMS</span></div></div></div>
-        <div class="step" data-reveal><span class="idx">04</span><div><h3>Launch & Grow</h3><p>We ship, measure and keep refining. Good websites are never really finished.</p><div class="tags"><span class="chip">QA</span><span class="chip">Analytics</span><span class="chip">Iteration</span></div></div></div>
+        <div class="step" data-reveal><span class="idx">01</span><div><h3>Discover</h3><p>We audit what exists, talk to your team, and pin down the one problem the project has to solve.</p><div class="tags"><span class="chip">Audit</span><span class="chip">Strategy</span><span class="chip">Research</span></div></div></div>
+        <div class="step" data-reveal><span class="idx">02</span><div><h3>Define</h3><p>Architecture, sitemap or system design. We agree on direction before a single screen or schema is built.</p><div class="tags"><span class="chip">Architecture</span><span class="chip">System design</span></div></div></div>
+        <div class="step" data-reveal><span class="idx">03</span><div><h3>Design & Build</h3><p>Designed and developed in tight loops — you see real, working software early and often.</p><div class="tags"><span class="chip">UI design</span><span class="chip">Front-end</span><span class="chip">Backend</span><span class="chip">Integrations</span></div></div></div>
+        <div class="step" data-reveal><span class="idx">04</span><div><h3>Launch & Grow</h3><p>We ship, measure and keep refining. Good systems are never really finished.</p><div class="tags"><span class="chip">QA</span><span class="chip">Monitoring</span><span class="chip">Iteration</span></div></div></div>
       </div>
     </div>
   </section>
 
-  <!-- TESTIMONIAL -->
+  <!-- VALUE STATEMENT -->
   <section class="section wrap">
-    <div style="max-width:24ch;" class="mono" data-reveal>(03) — From a client</div>
-    <blockquote class="quote display" data-reveal style="margin-top:32px; max-width:20ch;">
-      “{site.name} didn't just redesign our site — they <span class="accent">rethought how we tell our story</span>. Traffic doubled in a quarter.”
+    <div style="max-width:24ch;" class="mono" data-reveal>(03) — What client work means to us</div>
+    <blockquote class="quote display" data-reveal style="margin-top:32px; max-width:24ch;">
+      No middlemen, no junior hand-offs. <span class="accent">You talk to the people building it</span>, from the first call to the day it ships.
     </blockquote>
-    <div class="quote-by" data-reveal data-reveal-delay="1">
-      <div class="avatar ph"></div>
-      <div>
-        <div style="font-weight:500;">Marisa Cole</div>
-        <div class="mono">VP Marketing, Northwind Capital</div>
-      </div>
-    </div>
   </section>
 
   <!-- CTA BAND -->

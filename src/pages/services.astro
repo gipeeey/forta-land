@@ -3,19 +3,21 @@ import Base from '../layouts/Base.astro';
 import { site } from '../config';
 
 const services = [
-  { id: 'consulting', idx: '01', title: 'Consulting & Audits', body: 'A structured review of your current site against the things that matter: speed, accessibility, conversion, structure and search. You get a prioritised, plain-English roadmap you can act on — with or without us.', chips: ['Performance audit', 'UX review', 'Conversion', 'Tech strategy'] },
-  { id: 'brand', idx: '02', title: 'Brand & Identity', body: 'The foundation everything else sits on. Naming, logo, colour, typography and a voice that sounds like you — packaged in guidelines your whole team can use.', chips: ['Identity', 'Logo', 'Type system', 'Guidelines'] },
-  { id: 'design', idx: '03', title: 'Website Design', body: 'Custom, content-first design. We design in the browser as much as on the canvas, so what you approve is what you ship — responsive, accessible and unmistakably yours.', chips: ['Art direction', 'UI design', 'Prototyping', 'Motion'] },
-  { id: 'build', idx: '04', title: 'Development & Build', body: 'Hand-built front-ends with a CMS your team will actually enjoy. Clean, fast, maintainable code — and a handover that doesn’t leave you stranded.', chips: ['Front-end', 'Headless CMS', 'E-commerce', 'Integrations'] },
-  { id: 'seo', idx: '05', title: 'SEO & Performance', body: 'Technical SEO, Core Web Vitals and analytics done properly, so the site you paid for is actually found — and stays fast as it grows.', chips: ['Technical SEO', 'Core Web Vitals', 'Analytics'] },
-  { id: 'care', idx: '06', title: 'Care & Growth', body: 'A relationship, not a hand-off. Hosting, monitoring, content updates and a steady drumbeat of experiments that compound over time.', chips: ['Maintenance', 'Hosting', 'A/B testing', 'Retainers'] },
+  { id: 'discovery', idx: '01', title: 'Discovery & Consulting', body: 'Before any code gets written, we figure out what actually needs to be built. Requirements research, audits of what you already have, and a technical roadmap you can act on — with or without us.', chips: ['Requirements research', 'System audit', 'Tech strategy', 'Architecture'] },
+  { id: 'web', idx: '02', title: 'Websites & Landing Pages', body: 'Company profiles, marketing sites and landing pages for startups and growing businesses — fast, content-first, and built to be found.', chips: ['Company profile', 'Landing pages', 'CMS', 'Technical SEO'] },
+  { id: 'webapp', idx: '03', title: 'Web Apps & Dashboards', body: 'Custom web applications and internal dashboards built around how your team actually works — authentication, roles, reporting, the lot.', chips: ['Custom web apps', 'Admin dashboards', 'Auth & roles', 'API design'] },
+  { id: 'systems', idx: '04', title: 'Systems Integration & Custom Software', body: 'Custom information systems, CMS platforms and integrations that connect the tools your business already runs on — built for businesses outgrowing off-the-shelf software, and as a technical partner for agencies who need engineering hands.', chips: ['System integration', 'Custom CMS', 'Sistem informasi', 'Automation'] },
+  { id: 'ecommerce', idx: '05', title: 'E-commerce', body: 'Online stores with payments, inventory and checkout flows that don’t fall apart at scale.', chips: ['Online stores', 'Payment integration', 'Inventory', 'Checkout UX'] },
+  { id: 'desktop', idx: '06', title: 'Desktop Applications', body: 'Cross-platform desktop tools for the workflows that don’t belong in a browser tab.', chips: ['Desktop apps', 'Internal tools', 'Cross-platform', 'Offline-first'] },
+  { id: 'care', idx: '07', title: 'Care & Growth', body: 'A relationship, not a hand-off. Hosting, monitoring, fixes and a steady stream of improvements once it’s live.', chips: ['Maintenance', 'Hosting', 'Monitoring', 'Retainers'] },
 ];
 
 const faq = [
-  { q: 'How long does a project take?', a: 'Most full builds run 8–14 weeks depending on scope and content readiness. Audits take two weeks. We’ll give you a firm timeline before we start.' },
-  { q: 'Do you work with our existing brand?', a: 'Absolutely. If you already have a brand you love, we’ll build on it. If it needs work, we can refresh it — your call.' },
-  { q: 'What do you build sites in?', a: 'We’re stack-agnostic and choose tools that fit your team. Often that’s a modern front-end with a headless CMS, but we’ll recommend what’s right for you.' },
-  { q: 'Can you just audit our current site?', a: 'Yes — many clients start with an audit and decide on next steps from there. No obligation to continue.' },
+  { q: 'How long does a project take?', a: 'It depends a lot on what you’re building — a landing page might take 2–4 weeks, while a custom system or full web app usually runs 8 weeks or more. We’ll give you a realistic timeline after a quick discovery call.' },
+  { q: 'Do you work with our existing brand or systems?', a: 'Yes. If you already have something working — a brand, a legacy system, an existing codebase — we build on it. If it needs rethinking, we can do that too.' },
+  { q: 'What technology do you use?', a: 'We’re stack-agnostic and pick tools that fit the problem and your team, whether that’s a web front-end, a desktop app, or wiring two systems together.' },
+  { q: 'Can you just help us figure out what we actually need?', a: 'Yes — a lot of engagements start as discovery or consulting before a single line of code gets written. No obligation to continue past that.' },
+  { q: 'Do you work with other agencies?', a: 'Often, yes. We partner with design and marketing agencies as their technical team — white-label or co-branded, whichever fits the relationship.' },
 ];
 
 const servicesJsonLd = services.map((s) => ({
@@ -39,7 +41,7 @@ const faqJsonLd = {
 
 <Base
   title="Services"
-  description="Consulting, brand, design, development, SEO and ongoing care. The full range of how FORTA builds the web."
+  description="Discovery, websites, web apps, systems integration, e-commerce, desktop software and ongoing care. The full range of how FORTA builds."
   mainLabel="Services"
   jsonLd={[...servicesJsonLd, faqJsonLd]}
 >
@@ -49,8 +51,8 @@ const faqJsonLd = {
       End-to-end, or<br>exactly where<br>you <span class="accent">need us</span>.
     </h1>
     <p class="lead" data-reveal data-reveal-delay="1" style="margin-top:32px;">
-      Six disciplines, one team. Bring us a blank page or a site that's underperforming —
-      we'll meet you wherever the work is.
+      Seven disciplines, one team. Bring us a blank page, a legacy system, or a business
+      process that's outgrown its tools — we'll meet you wherever the work is.
     </p>
   </section>
 
@@ -75,26 +77,26 @@ const faqJsonLd = {
     <div class="grid cols-3">
       <div class="step" style="border-top-color:var(--line-strong);" data-reveal>
         <div>
-          <div class="mono accent">A — Sprint</div>
-          <h3 style="margin-top:14px;">The Audit</h3>
-          <p>A two-week deep dive into your existing site, ending in a prioritised roadmap and a working session.</p>
-          <p class="mono" style="margin-top:20px; color:var(--paper);">From $4k</p>
+          <div class="mono accent">A — Discovery</div>
+          <h3 style="margin-top:14px;">Audit & Roadmap</h3>
+          <p>A focused deep dive into what you have and what you actually need, ending in a clear, prioritised plan.</p>
+          <p class="mono" style="margin-top:20px; color:var(--paper);">Scoped after a quick call</p>
         </div>
       </div>
       <div class="step" style="border-top-color:var(--accent);" data-reveal data-reveal-delay="1">
         <div>
           <div class="mono accent">B — Project</div>
           <h3 style="margin-top:14px;">Full Build</h3>
-          <p>Brand, design and development of a complete site. Our most popular engagement, typically 8–14 weeks.</p>
-          <p class="mono" style="margin-top:20px; color:var(--paper);">From $28k</p>
+          <p>Design and development of a complete website, web app, or system — start to launch. Our most common engagement.</p>
+          <p class="mono" style="margin-top:20px; color:var(--paper);">Scoped after a quick call</p>
         </div>
       </div>
       <div class="step" style="border-top-color:var(--line-strong);" data-reveal data-reveal-delay="2">
         <div>
           <div class="mono accent">C — Retainer</div>
           <h3 style="margin-top:14px;">Ongoing Partner</h3>
-          <p>A monthly block of design and development time to keep improving, testing and shipping.</p>
-          <p class="mono" style="margin-top:20px; color:var(--paper);">From $3k / mo</p>
+          <p>A monthly block of development time to keep improving, integrating and shipping after launch.</p>
+          <p class="mono" style="margin-top:20px; color:var(--paper);">Scoped after a quick call</p>
         </div>
       </div>
     </div>

@@ -3,7 +3,7 @@
   "configurations": [
     {
       "name": "forta-dev",
-      "runtimeExecutable": "npm",
+      "runtimeExecutable": "bun",
       "runtimeArgs": ["run", "dev"],
       "autoPort": true,
       "port": 4321

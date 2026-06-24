@@ -4,28 +4,28 @@ import { site } from '../config';
 
 const values = [
   { n: '01', title: 'Craft over volume', body: 'We take fewer projects so each one gets the attention it deserves. Quantity is easy; care is not.' },
-  { n: '02', title: 'Performance is design', body: 'A beautiful site that loads slowly is a broken site. Speed and accessibility are part of the work, not an afterthought.' },
-  { n: '03', title: 'Show, don’t tell', body: 'We work in the open with real, working pages — so you’re never approving a pretty picture that can’t be built.' },
-  { n: '04', title: 'Outlast the launch', body: 'The launch is the start. We design sites to be maintained, measured and improved for years.' },
+  { n: '02', title: 'Performance is design', body: 'A beautiful product that loads slowly or breaks under load is a broken product. Speed and reliability are part of the work, not an afterthought.' },
+  { n: '03', title: 'Show, don’t tell', body: 'We work in the open with real, working software — so you’re never approving a pretty picture that can’t actually be built.' },
+  { n: '04', title: 'Outlast the launch', body: 'The launch is the start. We build systems to be maintained, monitored and improved for years.' },
 ];
 
 const team = [
-  { name: 'Elena Park', role: 'Founder · Strategy' },
-  { name: 'Theo Marsh', role: 'Design Director' },
-  { name: 'Priya Nair', role: 'Lead Engineer' },
-  { name: 'Sam Okoro', role: 'Motion · Front-end' },
+  { name: 'Founder', role: 'Full-stack · Strategy' },
+  { name: 'Engineer', role: 'Backend · Systems' },
+  { name: 'Engineer', role: 'Frontend · Design' },
+  { name: 'Engineer', role: 'Integrations · QA' },
 ];
 ---
 
 <Base
   title="Studio"
-  description={`${site.name} is a small senior team consulting on, designing and building websites since ${site.founded}.`}
+  description={`${site.name} is a small, senior team of programmers and designers who research, design and build software since ${site.founded}.`}
   mainLabel="Studio"
 >
   <section class="page-hero wrap">
     <div class="eyebrow" data-reveal>The studio</div>
     <h1 class="display h-xl" data-reveal style="margin-top:24px; max-width:18ch;">
-      A small team<br>that takes the<br>web <span class="accent">seriously</span>.
+      A small team<br>that takes building<br><span class="accent">seriously</span>.
     </h1>
   </section>
 
@@ -34,14 +34,15 @@ const team = [
       <div class="mono" data-reveal>(01) — Who we are</div>
       <div>
         <p class="display h-md" data-reveal style="line-height:1.2;">
-          {site.name} is a digital studio founded in {site.founded}. We're deliberately small —
-          a senior group of strategists, designers and developers who'd rather do a
-          few things <span class="accent">exceptionally well</span> than everything at once.
+          {site.name} started as a handful of programmer friends who kept getting asked to
+          solve problems bigger than "just a website" — internal systems, integrations,
+          dashboards that <span class="accent">actually had to work</span>.
         </p>
         <p class="body" data-reveal data-reveal-delay="1" style="margin-top:28px; max-width:56ch;">
-          No account managers, no hand-offs to a junior team after the pitch. The people you meet are
-          the people who do the work. We've shipped over a hundred sites for founders, marketers and
-          fellow agencies who needed a partner that sweats the details.
+          No account managers, no hand-offs to a junior team after the pitch — the people you
+          talk to are the people who build it. We take on everything from a focused landing page
+          for a growing startup to full system integrations for established businesses, and we're
+          glad to work alongside design agencies who need a technical team.
         </p>
       </div>
     </div>
@@ -77,16 +78,6 @@ const team = [
           <div class="meta"><div><h3 style="font-size:1.2rem;">{p.name}</h3><div class="tags">{p.role}</div></div></div>
         </div>
       ))}
-    </div>
-  </section>
-
-  <!-- Clients marquee -->
-  <section class="section-sm">
-    <div class="wrap"><div class="eyebrow" data-reveal style="margin-bottom:28px;">Trusted by</div></div>
-    <div class="marquee" aria-hidden="true">
-      <div class="marquee-track">
-        <span>Northwind</span><span>Field & Flora</span><span>Lumen</span><span>Casa Ondina</span><span>Atlas Mobility</span><span>Verge</span>
-      </div>
     </div>
   </section>
 
