@@ -1,0 +1,171 @@
+---
+import Base from '../layouts/Base.astro';
+import { site } from '../config';
+
+const services = [
+  { n: '01', title: 'Consulting & Audits', desc: "A clear-eyed look at what's holding your site back — performance, conversion, structure — and a plan to fix it." },
+  { n: '02', title: 'Brand & Identity', desc: 'Names, marks, type systems and voice that give your business a face worth remembering.' },
+  { n: '03', title: 'Website Design', desc: 'Custom, content-first design — no templates, no guesswork. Crafted screen by screen.' },
+  { n: '04', title: 'Development & Build', desc: 'Hand-built, blazing-fast front-ends and the CMS your team will actually enjoy using.' },
+  { n: '05', title: 'SEO & Performance', desc: 'Core Web Vitals, technical SEO and analytics so your site is found and stays fast.' },
+  { n: '06', title: 'Care & Growth', desc: 'Ongoing support, iteration and experiments that keep the site improving long after launch.' },
+];
+---
+
+<Base
+  title={`${site.name} — Digital Studio`}
+  description={site.description}
+  mainLabel="Home"
+>
+  <!-- HERO -->
+  <section class="hero wrap">
+    <div class="hero-title">
+      <div class="eyebrow" data-reveal>Digital studio · Est. {site.founded} · Worldwide</div>
+      <h1 class="display h-xxl" style="margin-top:24px;">
+        <span class="line-mask" data-reveal><span>We make the</span></span>
+        <span class="line-mask" data-reveal data-reveal-delay="1"><span>web <span class="accent">worth</span></span></span>
+        <span class="line-mask" data-reveal data-reveal-delay="2"><span>visiting.</span></span>
+      </h1>
+    </div>
+    <div class="hero-meta">
+      <p class="lead" data-reveal data-reveal-delay="2">
+        A studio for brands that refuse to blend in. We consult, design, and build
+        websites that perform as good as they look.
+      </p>
+      <div class="scroll-cue mono" data-reveal data-reveal-delay="3">
+        <span class="track"></span> Scroll to explore
+      </div>
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      <span>Strategy</span><span>Brand</span><span>Design</span><span>Build</span><span>Motion</span><span>SEO</span>
+    </div>
+  </div>
+
+  <!-- MANIFESTO -->
+  <section class="section wrap">
+    <div class="two-col">
+      <div class="mono" data-reveal>(01) — What we believe</div>
+      <div>
+        <p class="display h-md" data-reveal style="line-height:1.18;">
+          Most websites are forgotten the moment they load. We build the
+          other kind — <span class="accent">fast, considered, and unmistakably yours</span>.
+          Every pixel earns its place, every interaction has intent.
+        </p>
+        <div style="margin-top:48px;" data-reveal data-reveal-delay="1">
+          <a href="/about" class="tlink">Meet the studio →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section class="section wrap" id="services">
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:24px; margin-bottom:40px;">
+      <div>
+        <div class="eyebrow" data-reveal>What we do</div>
+        <h2 class="display h-lg" data-reveal style="margin-top:18px;">Six ways we help.</h2>
+      </div>
+      <a href="/services" class="tlink" data-reveal>All services →</a>
+    </div>
+
+    <div class="svc-list">
+      {services.map((s) => (
+        <a class="svc-row" href="/services" data-reveal>
+          <span class="num">{s.n}</span>
+          <div><h3>{s.title}</h3></div>
+          <span class="plus">+</span>
+          <p class="svc-desc" style="grid-column:2;">{s.desc}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- SELECTED WORK -->
+  <section class="section wrap" id="work">
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:24px; margin-bottom:44px;">
+      <div>
+        <div class="eyebrow" data-reveal>Selected work</div>
+        <h2 class="display h-lg" data-reveal style="margin-top:18px;">Recent projects.</h2>
+      </div>
+      <span class="mono" data-reveal>(02) — 2023–2026</span>
+    </div>
+
+    <div class="grid cols-2">
+      <a class="work-card" href="#" data-reveal>
+        <div class="ph"><div class="img-inner"><span class="label">Case study — Fintech</span></div><div class="scrim"></div></div>
+        <div class="meta"><h3>Northwind Capital</h3><span class="tags">Brand · Web · 2026</span></div>
+      </a>
+      <a class="work-card tall" href="#" data-reveal data-reveal-delay="1" style="margin-top:64px;">
+        <div class="ph"><div class="img-inner"><span class="label">Case study — DTC</span></div><div class="scrim"></div></div>
+        <div class="meta"><h3>Field & Flora</h3><span class="tags">Design · Build · 2025</span></div>
+      </a>
+      <a class="work-card tall" href="#" data-reveal>
+        <div class="ph"><div class="img-inner"><span class="label">Case study — SaaS</span></div><div class="scrim"></div></div>
+        <div class="meta"><h3>Lumen Analytics</h3><span class="tags">Consulting · SEO · 2025</span></div>
+      </a>
+      <a class="work-card" href="#" data-reveal data-reveal-delay="1" style="margin-top:64px;">
+        <div class="ph"><div class="img-inner"><span class="label">Case study — Hospitality</span></div><div class="scrim"></div></div>
+        <div class="meta"><h3>Casa Ondina</h3><span class="tags">Brand · Web · Motion</span></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="section-sm wrap">
+    <div class="grid cols-4">
+      <div class="stat" data-reveal><div class="num">120<span class="accent">+</span></div><div class="cap">Sites shipped since {site.founded}</div></div>
+      <div class="stat" data-reveal data-reveal-delay="1"><div class="num">98<span class="accent">/100</span></div><div class="cap">Median Lighthouse performance score</div></div>
+      <div class="stat" data-reveal data-reveal-delay="2"><div class="num">2.4<span class="accent">×</span></div><div class="cap">Average lift in conversion after relaunch</div></div>
+      <div class="stat" data-reveal data-reveal-delay="3"><div class="num">11<span class="accent">yr</span></div><div class="cap">Years crafting for the web</div></div>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section class="section wrap">
+    <div class="two-col">
+      <div class="sticky-col">
+        <div class="eyebrow" data-reveal>How we work</div>
+        <h2 class="display h-lg" data-reveal style="margin-top:18px;">A process<br>with no waste.</h2>
+        <p class="body" data-reveal data-reveal-delay="1" style="margin-top:24px; max-width:34ch;">
+          Four phases, fully collaborative. You're never guessing where the project stands.
+        </p>
+      </div>
+      <div>
+        <div class="step" data-reveal><span class="idx">01</span><div><h3>Discover</h3><p>We audit what exists, interview your team, and pin down the one job the site must do.</p><div class="tags"><span class="chip">Audit</span><span class="chip">Strategy</span><span class="chip">Research</span></div></div></div>
+        <div class="step" data-reveal><span class="idx">02</span><div><h3>Define</h3><p>Sitemap, narrative and a design language. We agree on direction before a single screen is polished.</p><div class="tags"><span class="chip">Architecture</span><span class="chip">Art direction</span></div></div></div>
+        <div class="step" data-reveal><span class="idx">03</span><div><h3>Design & Build</h3><p>Designed and developed in tight loops — you see real, working pages early and often.</p><div class="tags"><span class="chip">UI design</span><span class="chip">Front-end</span><span class="chip">CMS</span></div></div></div>
+        <div class="step" data-reveal><span class="idx">04</span><div><h3>Launch & Grow</h3><p>We ship, measure and keep refining. Good websites are never really finished.</p><div class="tags"><span class="chip">QA</span><span class="chip">Analytics</span><span class="chip">Iteration</span></div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIAL -->
+  <section class="section wrap">
+    <div style="max-width:24ch;" class="mono" data-reveal>(03) — From a client</div>
+    <blockquote class="quote display" data-reveal style="margin-top:32px; max-width:20ch;">
+      “{site.name} didn't just redesign our site — they <span class="accent">rethought how we tell our story</span>. Traffic doubled in a quarter.”
+    </blockquote>
+    <div class="quote-by" data-reveal data-reveal-delay="1">
+      <div class="avatar ph"></div>
+      <div>
+        <div style="font-weight:500;">Marisa Cole</div>
+        <div class="mono">VP Marketing, Northwind Capital</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA BAND -->
+  <section class="section wrap cta-band">
+    <div class="eyebrow" data-reveal style="justify-content:center;">Let's build</div>
+    <h2 class="display" data-reveal style="margin-top:24px;">
+      Have a project<br><span class="stroke">in mind?</span>
+    </h2>
+    <div style="margin-top:48px;" data-reveal data-reveal-delay="1">
+      <a href="/contact" class="btn btn--accent" data-magnetic style="font-size:.9rem; padding:1.1em 1.8em;">Start a project <span class="arrow">↗</span></a>
+    </div>
+  </section>
+</Base>

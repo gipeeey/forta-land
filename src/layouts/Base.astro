@@ -1,0 +1,93 @@
+---
+// Shared page shell: <head> + SEO, fixed 3D canvas, header, footer,
+// and the deferred interaction/scene scripts. Pages render into <slot />.
+import '@fontsource/space-grotesk/400.css';
+import '@fontsource/space-grotesk/500.css';
+import '@fontsource/space-grotesk/600.css';
+import '@fontsource/space-grotesk/700.css';
+import '@fontsource/space-mono/400.css';
+import '@fontsource/space-mono/700.css';
+import '../styles/global.css';
+
+import SEO from '../components/SEO.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { site } from '../config';
+
+interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+  type?: string;
+  noindex?: boolean;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  /** Label for the <main data-screen-label> attribute. */
+  mainLabel?: string;
+}
+
+const { title, description, image, type, noindex, jsonLd, mainLabel } = Astro.props;
+
+// Site-wide Organization + WebSite structured data, merged with page JSON-LD.
+const baseJsonLd: Record<string, unknown>[] = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: site.name,
+    legalName: site.legalName,
+    url: site.url,
+    email: site.email,
+    description: site.description,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: site.name,
+    url: site.url,
+  },
+];
+const pageJsonLd = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
+const allJsonLd = [...baseJsonLd, ...pageJsonLd];
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="sitemap" href="/sitemap-index.xml" />
+  <SEO
+    title={title}
+    description={description}
+    image={image}
+    type={type}
+    noindex={noindex}
+    jsonLd={allJsonLd}
+  />
+</head>
+<body>
+  <canvas id="bg-canvas"></canvas>
+  <div class="atmosphere"></div>
+
+  <Header />
+
+  <main data-screen-label={mainLabel}>
+    <slot />
+  </main>
+
+  <Footer />
+
+  <script>
+    // Site interactions load eagerly (tiny). The heavy WebGL scene is
+    // code-split and deferred to idle so it never blocks first paint.
+    import '../lib/site.js';
+    const startScene = () =>
+      import('../lib/scene.js').then((m) => m.initScene());
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(() => startScene(), { timeout: 2000 });
+    } else {
+      window.addEventListener('load', () => startScene());
+    }
+  </script>
+</body>
+</html>

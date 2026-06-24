@@ -1,0 +1,75 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('journal', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+
+const fmt = (d: Date) =>
+  d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+
+const featured = posts.find((p) => p.data.featured) ?? posts[0];
+const rest = posts.filter((p) => p.id !== featured?.id);
+const delays = ['', '1', '2'];
+---
+
+<Base
+  title="Journal"
+  description="Thinking out loud about design, performance and what makes a website worth building."
+  mainLabel="Journal"
+>
+  <section class="page-hero wrap">
+    <div class="eyebrow" data-reveal>Journal</div>
+    <h1 class="display h-xl" data-reveal style="margin-top:24px; max-width:16ch;">
+      Notes from<br>the <span class="accent">studio</span>.
+    </h1>
+    <p class="lead" data-reveal data-reveal-delay="1" style="margin-top:32px;">
+      Thinking out loud about design, performance and what makes a website worth building.
+    </p>
+  </section>
+
+  {featured && (
+    <section class="section-sm wrap">
+      <a href={`/journal/${featured.id}`} class="work-card" data-reveal>
+        <div class="ph" style="aspect-ratio:16/7; border-radius:16px;"><div class="img-inner"><span class="label">Featured cover</span></div><div class="scrim"></div></div>
+        <div class="meta" style="margin-top:24px;">
+          <div>
+            <div class="mono accent">Featured · {featured.data.tag}</div>
+            <h3 style="font-size:clamp(1.6rem,3.4vw,2.6rem); margin-top:12px;">{featured.data.title}</h3>
+          </div>
+          <span class="tags">{featured.data.readingTime} · {fmt(featured.data.date)}</span>
+        </div>
+      </a>
+    </section>
+  )}
+
+  <section class="section-sm wrap">
+    <div class="grid cols-3">
+      {rest.map((post, i) => (
+        <a href={`/journal/${post.id}`} class="work-card" data-reveal data-reveal-delay={delays[i % 3] || undefined}>
+          <div class="ph"><div class="img-inner"><span class="label">Cover</span></div><div class="scrim"></div></div>
+          <div class="meta"><div><div class="mono accent">{post.data.tag}</div><h3 style="font-size:1.3rem; margin-top:10px;">{post.data.title}</h3></div></div>
+          <span class="tags">{post.data.readingTime} · {fmt(post.data.date)}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- Newsletter -->
+  <section class="section wrap">
+    <div class="two-col" style="align-items:center;">
+      <div>
+        <div class="eyebrow" data-reveal>Subscribe</div>
+        <h2 class="display h-lg" data-reveal style="margin-top:18px;">One good email<br>a month.</h2>
+      </div>
+      <form data-reveal data-reveal-delay="1" onsubmit="event.preventDefault(); this.querySelector('span.s').style.display='block';" style="display:flex; flex-direction:column; gap:16px;">
+        <div class="field"><label for="nl">Email</label><input id="nl" type="email" placeholder="you@email.com" required /></div>
+        <div>
+          <button class="btn btn--accent" style="font-size:.82rem;">Subscribe <span class="arrow">↗</span></button>
+          <span class="s mono" style="display:none; color:var(--accent); margin-top:14px;">You're in. Talk soon.</span>
+        </div>
+      </form>
+    </div>
+  </section>
+</Base>

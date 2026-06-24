@@ -1,0 +1,104 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection, render } from 'astro:content';
+import { site } from '../../config';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('journal', ({ data }) => !data.draft);
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const { data } = post;
+
+const fmt = (d: Date) =>
+  d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+// Suggest the next most-recent post to keep reading.
+const all = (await getCollection('journal', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+const idx = all.findIndex((p) => p.id === post.id);
+const next = all[(idx + 1) % all.length];
+
+const articleJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: data.title,
+  description: data.description,
+  datePublished: data.date.toISOString(),
+  author: { '@type': 'Person', name: data.author },
+  publisher: { '@type': 'Organization', name: site.name, url: site.url },
+  mainEntityOfPage: new URL(`/journal/${post.id}`, site.url).href,
+};
+
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Journal', item: new URL('/journal', site.url).href },
+    { '@type': 'ListItem', position: 2, name: data.title, item: new URL(`/journal/${post.id}`, site.url).href },
+  ],
+};
+---
+
+<Base
+  title={data.title}
+  description={data.description}
+  type="article"
+  mainLabel="Article"
+  jsonLd={[articleJsonLd, breadcrumbJsonLd]}
+>
+  <article>
+    <header class="page-hero wrap" style="text-align:center;">
+      <a href="/journal" class="tlink" data-reveal style="justify-content:center;">← Back to journal</a>
+      <div class="mono accent" data-reveal style="margin-top:32px;">{data.tag} · {data.readingTime} read · {fmt(data.date)}</div>
+      <h1 class="display h-lg" data-reveal data-reveal-delay="1" style="margin-top:20px; max-width:20ch; margin-inline:auto;">
+        {data.title}
+      </h1>
+      <p class="lead" data-reveal data-reveal-delay="2" style="margin-top:24px; margin-inline:auto; text-align:center;">
+        {data.description}
+      </p>
+    </header>
+
+    <div class="wrap" data-reveal>
+      <figure style="max-width:1000px; margin-inline:auto;">
+        <div class="ph" style="aspect-ratio:16/8; border-radius:16px;"><div class="img-inner"><span class="label">Article hero image</span></div></div>
+      </figure>
+    </div>
+
+    <div class="section-sm wrap">
+      <div class="prose" data-reveal>
+        <Content />
+      </div>
+
+      {data.authorRole && (
+        <div class="prose" data-reveal style="margin-top:56px;">
+          <div class="quote-by" style="border-top:1px solid var(--line); padding-top:28px; margin-top:0;">
+            <div class="avatar ph"></div>
+            <div>
+              <div style="font-weight:500;">{data.author}</div>
+              <div class="mono">{data.authorRole}</div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  </article>
+
+  {next && (
+    <section class="section wrap">
+      <div class="eyebrow" data-reveal style="margin-bottom:28px;">Keep reading</div>
+      <a href={`/journal/${next.id}`} class="svc-row" data-reveal style="text-decoration:none;">
+        <span class="num">→</span>
+        <div><h3>{next.data.title}</h3></div>
+        <span class="plus">+</span>
+        <p class="svc-desc" style="grid-column:2;">{next.data.description}</p>
+      </a>
+    </section>
+  )}
+</Base>

@@ -1,0 +1,128 @@
+---
+import Base from '../layouts/Base.astro';
+import { site } from '../config';
+
+const services = [
+  { id: 'consulting', idx: '01', title: 'Consulting & Audits', body: 'A structured review of your current site against the things that matter: speed, accessibility, conversion, structure and search. You get a prioritised, plain-English roadmap you can act on — with or without us.', chips: ['Performance audit', 'UX review', 'Conversion', 'Tech strategy'] },
+  { id: 'brand', idx: '02', title: 'Brand & Identity', body: 'The foundation everything else sits on. Naming, logo, colour, typography and a voice that sounds like you — packaged in guidelines your whole team can use.', chips: ['Identity', 'Logo', 'Type system', 'Guidelines'] },
+  { id: 'design', idx: '03', title: 'Website Design', body: 'Custom, content-first design. We design in the browser as much as on the canvas, so what you approve is what you ship — responsive, accessible and unmistakably yours.', chips: ['Art direction', 'UI design', 'Prototyping', 'Motion'] },
+  { id: 'build', idx: '04', title: 'Development & Build', body: 'Hand-built front-ends with a CMS your team will actually enjoy. Clean, fast, maintainable code — and a handover that doesn’t leave you stranded.', chips: ['Front-end', 'Headless CMS', 'E-commerce', 'Integrations'] },
+  { id: 'seo', idx: '05', title: 'SEO & Performance', body: 'Technical SEO, Core Web Vitals and analytics done properly, so the site you paid for is actually found — and stays fast as it grows.', chips: ['Technical SEO', 'Core Web Vitals', 'Analytics'] },
+  { id: 'care', idx: '06', title: 'Care & Growth', body: 'A relationship, not a hand-off. Hosting, monitoring, content updates and a steady drumbeat of experiments that compound over time.', chips: ['Maintenance', 'Hosting', 'A/B testing', 'Retainers'] },
+];
+
+const faq = [
+  { q: 'How long does a project take?', a: 'Most full builds run 8–14 weeks depending on scope and content readiness. Audits take two weeks. We’ll give you a firm timeline before we start.' },
+  { q: 'Do you work with our existing brand?', a: 'Absolutely. If you already have a brand you love, we’ll build on it. If it needs work, we can refresh it — your call.' },
+  { q: 'What do you build sites in?', a: 'We’re stack-agnostic and choose tools that fit your team. Often that’s a modern front-end with a headless CMS, but we’ll recommend what’s right for you.' },
+  { q: 'Can you just audit our current site?', a: 'Yes — many clients start with an audit and decide on next steps from there. No obligation to continue.' },
+];
+
+const servicesJsonLd = services.map((s) => ({
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: s.title,
+  description: s.body,
+  provider: { '@type': 'Organization', name: site.name, url: site.url },
+}));
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faq.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+---
+
+<Base
+  title="Services"
+  description="Consulting, brand, design, development, SEO and ongoing care. The full range of how FORTA builds the web."
+  mainLabel="Services"
+  jsonLd={[...servicesJsonLd, faqJsonLd]}
+>
+  <section class="page-hero wrap">
+    <div class="eyebrow" data-reveal>What we do</div>
+    <h1 class="display h-xl" data-reveal style="margin-top:24px; max-width:16ch;">
+      End-to-end, or<br>exactly where<br>you <span class="accent">need us</span>.
+    </h1>
+    <p class="lead" data-reveal data-reveal-delay="1" style="margin-top:32px;">
+      Six disciplines, one team. Bring us a blank page or a site that's underperforming —
+      we'll meet you wherever the work is.
+    </p>
+  </section>
+
+  <!-- Detailed services -->
+  <section class="section-sm wrap">
+    {services.map((s) => (
+      <article class="step" data-reveal id={s.id}>
+        <span class="idx">{s.idx}</span>
+        <div>
+          <h3>{s.title}</h3>
+          <p>{s.body}</p>
+          <div class="tags">{s.chips.map((c) => <span class="chip">{c}</span>)}</div>
+        </div>
+      </article>
+    ))}
+  </section>
+
+  <!-- Engagement models -->
+  <section class="section wrap">
+    <div class="eyebrow" data-reveal>Ways to work together</div>
+    <h2 class="display h-lg" data-reveal style="margin-top:18px; margin-bottom:48px;">Pick a starting point.</h2>
+    <div class="grid cols-3">
+      <div class="step" style="border-top-color:var(--line-strong);" data-reveal>
+        <div>
+          <div class="mono accent">A — Sprint</div>
+          <h3 style="margin-top:14px;">The Audit</h3>
+          <p>A two-week deep dive into your existing site, ending in a prioritised roadmap and a working session.</p>
+          <p class="mono" style="margin-top:20px; color:var(--paper);">From $4k</p>
+        </div>
+      </div>
+      <div class="step" style="border-top-color:var(--accent);" data-reveal data-reveal-delay="1">
+        <div>
+          <div class="mono accent">B — Project</div>
+          <h3 style="margin-top:14px;">Full Build</h3>
+          <p>Brand, design and development of a complete site. Our most popular engagement, typically 8–14 weeks.</p>
+          <p class="mono" style="margin-top:20px; color:var(--paper);">From $28k</p>
+        </div>
+      </div>
+      <div class="step" style="border-top-color:var(--line-strong);" data-reveal data-reveal-delay="2">
+        <div>
+          <div class="mono accent">C — Retainer</div>
+          <h3 style="margin-top:14px;">Ongoing Partner</h3>
+          <p>A monthly block of design and development time to keep improving, testing and shipping.</p>
+          <p class="mono" style="margin-top:20px; color:var(--paper);">From $3k / mo</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section wrap">
+    <div class="two-col">
+      <div class="sticky-col">
+        <div class="eyebrow" data-reveal>Good to know</div>
+        <h2 class="display h-lg" data-reveal style="margin-top:18px;">Questions,<br>answered.</h2>
+      </div>
+      <div>
+        {faq.map((f) => (
+          <details class="step" data-reveal style="cursor:pointer;">
+            <summary style="list-style:none;"><h3 style="display:inline;">{f.q}</h3></summary>
+            <p>{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section wrap cta-band">
+    <div class="eyebrow" data-reveal style="justify-content:center;">Next step</div>
+    <h2 class="display" data-reveal style="margin-top:24px;">Tell us what<br><span class="stroke">you're building.</span></h2>
+    <div style="margin-top:48px;" data-reveal data-reveal-delay="1">
+      <a href="/contact" class="btn btn--accent" data-magnetic style="font-size:.9rem; padding:1.1em 1.8em;">Start a project <span class="arrow">↗</span></a>
+    </div>
+  </section>
+</Base>

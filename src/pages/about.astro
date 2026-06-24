@@ -1,0 +1,100 @@
+---
+import Base from '../layouts/Base.astro';
+import { site } from '../config';
+
+const values = [
+  { n: '01', title: 'Craft over volume', body: 'We take fewer projects so each one gets the attention it deserves. Quantity is easy; care is not.' },
+  { n: '02', title: 'Performance is design', body: 'A beautiful site that loads slowly is a broken site. Speed and accessibility are part of the work, not an afterthought.' },
+  { n: '03', title: 'Show, don’t tell', body: 'We work in the open with real, working pages — so you’re never approving a pretty picture that can’t be built.' },
+  { n: '04', title: 'Outlast the launch', body: 'The launch is the start. We design sites to be maintained, measured and improved for years.' },
+];
+
+const team = [
+  { name: 'Elena Park', role: 'Founder · Strategy' },
+  { name: 'Theo Marsh', role: 'Design Director' },
+  { name: 'Priya Nair', role: 'Lead Engineer' },
+  { name: 'Sam Okoro', role: 'Motion · Front-end' },
+];
+---
+
+<Base
+  title="Studio"
+  description={`${site.name} is a small senior team consulting on, designing and building websites since ${site.founded}.`}
+  mainLabel="Studio"
+>
+  <section class="page-hero wrap">
+    <div class="eyebrow" data-reveal>The studio</div>
+    <h1 class="display h-xl" data-reveal style="margin-top:24px; max-width:18ch;">
+      A small team<br>that takes the<br>web <span class="accent">seriously</span>.
+    </h1>
+  </section>
+
+  <section class="section-sm wrap">
+    <div class="two-col">
+      <div class="mono" data-reveal>(01) — Who we are</div>
+      <div>
+        <p class="display h-md" data-reveal style="line-height:1.2;">
+          {site.name} is a digital studio founded in {site.founded}. We're deliberately small —
+          a senior group of strategists, designers and developers who'd rather do a
+          few things <span class="accent">exceptionally well</span> than everything at once.
+        </p>
+        <p class="body" data-reveal data-reveal-delay="1" style="margin-top:28px; max-width:56ch;">
+          No account managers, no hand-offs to a junior team after the pitch. The people you meet are
+          the people who do the work. We've shipped over a hundred sites for founders, marketers and
+          fellow agencies who needed a partner that sweats the details.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Values -->
+  <section class="section wrap">
+    <div class="eyebrow" data-reveal>What we value</div>
+    <h2 class="display h-lg" data-reveal style="margin-top:18px; margin-bottom:48px;">Four non-negotiables.</h2>
+    <div class="grid cols-2">
+      {values.map((v, i) => (
+        <div class="step" style="border-top-color:var(--line-strong);" data-reveal data-reveal-delay={i % 2 === 1 ? '1' : undefined}>
+          <div>
+            <div class="mono accent">{v.n}</div>
+            <h3 style="margin-top:12px;">{v.title}</h3>
+            <p>{v.body}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Team -->
+  <section class="section wrap">
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:24px; margin-bottom:44px;">
+      <div><div class="eyebrow" data-reveal>The people</div><h2 class="display h-lg" data-reveal style="margin-top:18px;">Who you'll work with.</h2></div>
+      <a href="/contact" class="tlink" data-reveal>We're hiring →</a>
+    </div>
+    <div class="grid cols-4">
+      {team.map((p, i) => (
+        <div class="work-card" data-reveal data-reveal-delay={String(i)}>
+          <div class="ph" style="aspect-ratio:3/4; border-radius:14px;"><div class="img-inner"><span class="label">Portrait</span></div></div>
+          <div class="meta"><div><h3 style="font-size:1.2rem;">{p.name}</h3><div class="tags">{p.role}</div></div></div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Clients marquee -->
+  <section class="section-sm">
+    <div class="wrap"><div class="eyebrow" data-reveal style="margin-bottom:28px;">Trusted by</div></div>
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee-track">
+        <span>Northwind</span><span>Field & Flora</span><span>Lumen</span><span>Casa Ondina</span><span>Atlas Mobility</span><span>Verge</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section wrap cta-band">
+    <div class="eyebrow" data-reveal style="justify-content:center;">Say hello</div>
+    <h2 class="display" data-reveal style="margin-top:24px;">Like how<br><span class="stroke">we think?</span></h2>
+    <div style="margin-top:48px;" data-reveal data-reveal-delay="1">
+      <a href="/contact" class="btn btn--accent" data-magnetic style="font-size:.9rem; padding:1.1em 1.8em;">Start a project <span class="arrow">↗</span></a>
+    </div>
+  </section>
+</Base>

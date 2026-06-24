@@ -1,0 +1,58 @@
+---
+// Reusable <head> SEO block: title, description, canonical,
+// Open Graph + Twitter Card, and optional JSON-LD structured data.
+import { site } from '../config';
+
+interface Props {
+  title: string;
+  description?: string;
+  /** Path to an OG image under /public (defaults to /og/default.svg). */
+  image?: string;
+  /** 'website' | 'article' */
+  type?: string;
+  /** Set true on pages that should not be indexed. */
+  noindex?: boolean;
+  /** One or more JSON-LD objects to embed. */
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+}
+
+const {
+  title,
+  description = site.description,
+  image = '/og/default.svg',
+  type = 'website',
+  noindex = false,
+  jsonLd,
+} = Astro.props;
+
+// Canonical + absolute OG image, resolved against the configured `site`.
+const canonical = new URL(Astro.url.pathname, Astro.site ?? site.url).href;
+const ogImage = new URL(image, Astro.site ?? site.url).href;
+const fullTitle = title.includes(site.name) ? title : `${title} — ${site.name}`;
+
+const blocks = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
+---
+
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+{noindex && <meta name="robots" content="noindex, nofollow" />}
+
+{/* Open Graph */}
+<meta property="og:type" content={type} />
+<meta property="og:site_name" content={site.name} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={ogImage} />
+
+{/* Twitter */}
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImage} />
+
+{/* Structured data */}
+{blocks.map((block) => (
+  <script type="application/ld+json" set:html={JSON.stringify(block)} />
+))}

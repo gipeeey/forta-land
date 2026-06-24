@@ -1,0 +1,30 @@
+---
+// Site header + mobile menu. Active link is derived from the current path,
+// so there is a single definition instead of one copy per page.
+import { site, nav } from '../config';
+
+const path = Astro.url.pathname;
+const isActive = (href: string) =>
+  href === '/' ? path === '/' : path.startsWith(href);
+---
+
+<header class="site-header">
+  <nav class="nav wrap">
+    <a href="/" class="brand"><span class="dot"></span>{site.name}</a>
+    <div class="nav-links">
+      {nav.map((item) => (
+        <a href={item.href} class={isActive(item.href) ? 'active' : undefined}>
+          {item.label}
+        </a>
+      ))}
+    </div>
+    <div class="nav-cta">
+      <a href="/contact" class="btn btn--accent" data-magnetic>Start a project <span class="arrow">↗</span></a>
+      <button class="menu-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+</header>
+
+<div class="mobile-menu">
+  {nav.map((item) => <a href={item.href}>{item.label}</a>)}
+</div>

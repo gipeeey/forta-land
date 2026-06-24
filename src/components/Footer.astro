@@ -1,0 +1,32 @@
+---
+// Shared site footer.
+import { site, nav, social } from '../config';
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-col">
+        <h4>Studio</h4>
+        <p class="body" style="max-width:34ch;">A digital studio consulting on, designing and building websites for brands worldwide.</p>
+        <div style="margin-top:24px; display:flex; gap:12px; flex-wrap:wrap;">
+          <a href={`mailto:${site.email}`} class="btn btn--ghost">{site.email}</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Navigate</h4>
+        {nav.filter((i) => i.href !== '/').map((i) => <a href={i.href}>{i.label}</a>)}
+      </div>
+      <div class="footer-col">
+        <h4>Elsewhere</h4>
+        {social.map((s) => <a href={s.href}>{s.label} ↗</a>)}
+      </div>
+    </div>
+    <div class="footer-brand display">{site.name}</div>
+    <div class="footer-bottom mono">
+      <span>© {year} {site.legalName} — All rights reserved</span>
+      <span>Made for the web, by hand</span>
+    </div>
+  </div>
+</footer>

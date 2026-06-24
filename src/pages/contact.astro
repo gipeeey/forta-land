@@ -1,0 +1,143 @@
+---
+import Base from '../layouts/Base.astro';
+import { site, social } from '../config';
+
+const action = `https://formspree.io/f/${site.formspreeId}`;
+---
+
+<Base
+  title="Contact"
+  description={`Tell ${site.name} about your project. We read every message and reply within two working days.`}
+  mainLabel="Contact"
+>
+  <section class="page-hero wrap">
+    <div class="eyebrow" data-reveal>Start a project</div>
+    <h1 class="display h-xl" data-reveal style="margin-top:24px; max-width:16ch;">
+      Let's make<br>something<br><span class="accent">worth visiting</span>.
+    </h1>
+    <p class="lead" data-reveal data-reveal-delay="1" style="margin-top:32px;">
+      Tell us a little about your project. We read every message and reply within two working days.
+    </p>
+  </section>
+
+  <section class="section-sm wrap" id="form">
+    <div class="two-col">
+      <!-- Form -->
+      <form
+        data-reveal
+        method="POST"
+        action={action}
+        style="display:flex; flex-direction:column; gap:36px;"
+      >
+        <!-- Honeypot: bots fill this, humans never see it -->
+        <input type="text" name="_gotcha" class="vh" tabindex="-1" autocomplete="off" aria-hidden="true" />
+        <input type="hidden" name="_subject" value={`New enquiry — ${site.name}`} />
+
+        <div class="field">
+          <label for="name">Your name</label>
+          <input id="name" name="name" type="text" placeholder="Jane Doe" required />
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" placeholder="jane@company.com" required />
+        </div>
+        <div class="field">
+          <label for="company">Company</label>
+          <input id="company" name="company" type="text" placeholder="Company name" />
+        </div>
+        <div class="field">
+          <label>What do you need? (pick any)</label>
+          <div class="chip-select">
+            <label><input type="checkbox" name="services" value="consulting" /><span>Consulting</span></label>
+            <label><input type="checkbox" name="services" value="brand" /><span>Brand</span></label>
+            <label><input type="checkbox" name="services" value="design" /><span>Design</span></label>
+            <label><input type="checkbox" name="services" value="build" /><span>Build</span></label>
+            <label><input type="checkbox" name="services" value="seo" /><span>SEO</span></label>
+            <label><input type="checkbox" name="services" value="care" /><span>Care</span></label>
+          </div>
+        </div>
+        <div class="field">
+          <label for="budget">Rough budget</label>
+          <select id="budget" name="budget">
+            <option>Not sure yet</option>
+            <option>Under $10k</option>
+            <option>$10k – $30k</option>
+            <option>$30k – $75k</option>
+            <option>$75k+</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="msg">About the project</label>
+          <textarea id="msg" name="message" rows="4" placeholder="What are you building, and what does success look like?" required></textarea>
+        </div>
+        <div>
+          <button type="submit" class="btn btn--accent" style="font-size:.85rem; padding:1.05em 1.7em;">Send message <span class="arrow">↗</span></button>
+          <p id="form-status" class="mono" style="margin-top:18px; color:var(--accent); display:none;"></p>
+        </div>
+      </form>
+
+      <!-- Sidebar -->
+      <div class="sticky-col">
+        <div class="step" style="border-top-color:var(--line-strong); padding-top:24px;" data-reveal>
+          <div>
+            <h4 class="mono" style="color:var(--mist-2); margin-bottom:14px;">Email</h4>
+            <a href={`mailto:${site.email}`} class="display h-md" style="font-size:1.6rem;">{site.email}</a>
+          </div>
+        </div>
+        <div class="step" style="border-top-color:var(--line); padding-top:24px;" data-reveal data-reveal-delay="1">
+          <div>
+            <h4 class="mono" style="color:var(--mist-2); margin-bottom:14px;">Studio</h4>
+            <p class="body">{site.locations}</p>
+          </div>
+        </div>
+        <div class="step" style="border-top-color:var(--line); padding-top:24px;" data-reveal data-reveal-delay="2">
+          <div>
+            <h4 class="mono" style="color:var(--mist-2); margin-bottom:14px;">Follow</h4>
+            <div class="tag-list">
+              {social.slice(0, 3).map((s) => <a href={s.href} class="chip">{s.label} ↗</a>)}
+            </div>
+          </div>
+        </div>
+        <div class="step" style="border-top-color:var(--line); padding-top:24px;" data-reveal data-reveal-delay="3">
+          <div>
+            <h4 class="mono" style="color:var(--mist-2); margin-bottom:14px;">Response time</h4>
+            <p class="body">Within 2 working days. For anything urgent, say so in your message.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // Progressive enhancement: submit to Formspree via fetch so the
+    // visitor stays on the page. Without JS the plain POST still works.
+    const form = document.querySelector('form[action*="formspree.io"]');
+    const status = document.getElementById('form-status');
+    if (form && status) {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = form.querySelector('button[type=submit]');
+        const data = new FormData(form);
+        try {
+          const res = await fetch(form.action, {
+            method: 'POST',
+            body: data,
+            headers: { Accept: 'application/json' },
+          });
+          if (res.ok) {
+            form.reset();
+            status.textContent = "Thanks — we'll be in touch within two working days.";
+            status.style.display = 'block';
+            if (btn) btn.textContent = 'Sent ✓';
+          } else {
+            status.textContent = 'Something went wrong. Email us directly instead.';
+            status.style.display = 'block';
+          }
+        } catch {
+          status.textContent = 'Network error. Email us directly instead.';
+          status.style.display = 'block';
+        }
+      });
+    }
+  </script>
+</Base>
