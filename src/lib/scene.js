@@ -55,7 +55,7 @@ float snoise(vec3 v){
 
 // Displacement shared by the position pass and the normal-recompute pass.
 const DISP_GLSL = /* glsl */ `
-uniform float uTime, uFreq, uAmp, uMorph, uPulse;
+uniform float uTime, uFreq, uAmp, uMorph, uPulse, uPull;
 varying float vDisp;
 float fbm(vec3 p){
   float s = 0.0, a = 0.55, f = 1.0;
@@ -120,7 +120,7 @@ function makeBlob(envTex) {
 
   const uniforms = {
     uTime: { value: 0 }, uFreq: { value: 1.2 }, uAmp: { value: 0.34 },
-    uMorph: { value: 0 }, uPulse: { value: 0 }, uAccent: { value: ACCENT },
+    uMorph: { value: 0 }, uPulse: { value: 0 }, uPull: { value: 0 }, uAccent: { value: ACCENT },
   };
 
   const mat = new THREE.MeshPhysicalMaterial({
@@ -161,7 +161,11 @@ function makeBlob(envTex) {
         vec3 gNrm = normalize(cross(gPA - gP0, gPB - gP0));
         if(dot(gNrm, gN0) < 0.0) gNrm = -gNrm;
         vDisp = gD0;
+        // Liquid waist: cinch the equator inward like the surface is being
+        // pulled in two directions by scroll momentum, poles untouched.
+        float gPinch = cos(clamp(position.y / gRad, -1.0, 1.0) * 1.5707963);
         vec3 gDispPos = gP0;
+        gDispPos.xz *= 1.0 - uPull * gPinch * 0.6;
         vec3 objectNormal = gNrm;
         #ifdef USE_TANGENT
         vec3 objectTangent = vec3( tangent.xyz );
@@ -261,7 +265,7 @@ export function initScene() {
     renderer.setSize(w, h);
     if (composer) composer.setSize(w, h);
     isWide = w > 900;
-    blobBaseY = isWide ? 0.5 : -0.55;
+    blobBaseY = isWide ? 0.5 : -0.24;
     blob.position.x = isWide ? 2.3 : 0;
     blob.position.y = blobBaseY;
     // Portrait phones get a narrower horizontal FOV than the fixed vertical
@@ -290,6 +294,13 @@ export function initScene() {
     ).normalize();
     if (keyLight) keyLight.position.copy(blob.position).addScaledVector(lightW, 6);
 
+    // Lit and visible right at the hero, settling to its normal level as
+    // you scroll away from the top.
+    const introGlow = Math.max(0, 1 - scrollN * 2.2);
+    if (keyLight) keyLight.intensity = 60 + introGlow * 160;
+    if (rimLight) rimLight.intensity = 1.4 + introGlow * 2.2;
+    if (blob) blob.material.envMapIntensity = 1.35 + introGlow * 1.6;
+
     if (blob) {
       blobU.uTime.value = t * speed;
       blobU.uPulse.value = scrollV * 0.45;
@@ -297,6 +308,7 @@ export function initScene() {
       // before the stretch below pulls it into a venom-like tendril.
       blobU.uAmp.value = 0.34 - scrollN * 0.06 + scrollV * 0.4;
       blobU.uMorph.value = scrollN;                  // molten → crystalline
+      blobU.uPull.value = Math.abs(scrollVSigned);
       blob.rotation.y = t * 0.08 * speed + pointer.x * 0.4 + scrollN * Math.PI * 1.2;
       blob.rotation.x = pointer.y * 0.3 + scrollN * 0.8;
       const bs = blob.userData.baseScale || 0.85;
