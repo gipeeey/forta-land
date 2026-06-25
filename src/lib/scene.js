@@ -235,7 +235,7 @@ export function initScene() {
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const clock = new THREE.Clock();
   const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
-  let scrollN = 0, scrollTarget = 0, scrollV = 0;
+  let scrollN = 0, scrollTarget = 0, scrollV = 0, scrollVSigned = 0;
   let lastScroll = window.scrollY;
   let renderer, scene, camera, composer, blob, blobU, points, keyLight, rimLight;
   const lightW = new THREE.Vector3();
@@ -261,7 +261,7 @@ export function initScene() {
     renderer.setSize(w, h);
     if (composer) composer.setSize(w, h);
     isWide = w > 900;
-    blobBaseY = isWide ? 0.5 : -1.05;
+    blobBaseY = isWide ? 0.5 : -0.55;
     blob.position.x = isWide ? 2.3 : 0;
     blob.position.y = blobBaseY;
     // Portrait phones get a narrower horizontal FOV than the fixed vertical
@@ -276,6 +276,7 @@ export function initScene() {
     pointer.y += (pointer.ty - pointer.y) * 0.05;
     scrollN += (scrollTarget - scrollN) * 0.07;
     scrollV *= 0.9;
+    scrollVSigned *= 0.88;
 
     const speed = reduceMotion ? 0 : 1;
 
@@ -292,12 +293,19 @@ export function initScene() {
     if (blob) {
       blobU.uTime.value = t * speed;
       blobU.uPulse.value = scrollV * 0.45;
-      blobU.uAmp.value = 0.34 - scrollN * 0.06;     // calms as it resolves
+      // Scroll bursts churn the surface harder — a liquid roil — right
+      // before the stretch below pulls it into a venom-like tendril.
+      blobU.uAmp.value = 0.34 - scrollN * 0.06 + scrollV * 0.4;
       blobU.uMorph.value = scrollN;                  // molten → crystalline
       blob.rotation.y = t * 0.08 * speed + pointer.x * 0.4 + scrollN * Math.PI * 1.2;
       blob.rotation.x = pointer.y * 0.3 + scrollN * 0.8;
       const bs = blob.userData.baseScale || 0.85;
-      blob.scale.setScalar(bs * (1 - scrollN * 0.18));
+      const settle = bs * (1 - scrollN * 0.18);
+      // Stretch along the scroll axis, squeeze the cross-section — the
+      // squash/stretch of a liquid mass being dragged by momentum.
+      const stretch = 1 + Math.abs(scrollVSigned) * 0.55;
+      const squeeze = 1 - Math.abs(scrollVSigned) * 0.22;
+      blob.scale.set(settle * squeeze, settle * stretch, settle * squeeze);
 
       if (!isWide) {
         lagY += (lagTarget - lagY) * 0.12;
@@ -375,6 +383,7 @@ export function initScene() {
     scrollTarget = max > 0 ? window.scrollY / max : 0;
     const delta = window.scrollY - lastScroll;
     scrollV = Math.min(Math.abs(delta) / 40, 1);
+    scrollVSigned = Math.max(-1, Math.min(1, delta / 40));
     if (!isWide) lagTarget = Math.max(-0.8, Math.min(0.8, lagTarget + delta * 0.025));
     lastScroll = window.scrollY;
   }, { passive: true });
