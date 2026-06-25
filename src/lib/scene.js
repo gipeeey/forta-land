@@ -55,7 +55,7 @@ float snoise(vec3 v){
 
 // Displacement shared by the position pass and the normal-recompute pass.
 const DISP_GLSL = /* glsl */ `
-uniform float uTime, uFreq, uAmp, uMorph, uPulse, uPull;
+uniform float uTime, uFreq, uAmp, uMorph, uPulse, uPull, uTendril;
 varying float vDisp;
 float fbm(vec3 p){
   float s = 0.0, a = 0.55, f = 1.0;
@@ -67,7 +67,16 @@ float getDisp(vec3 pos){
   float molten = fbm(q);
   float ridge = 1.0 - abs(snoise(q*1.7 + 3.0));
   ridge = ridge*ridge - 0.45;
-  return mix(molten, ridge, uMorph) * (uAmp + uPulse);
+  float base = mix(molten, ridge, uMorph) * (uAmp + uPulse);
+  // Venom tendrils: thin ridged filaments that grow and reach outward as
+  // you scroll, biased toward the stretch axis so they stream like web
+  // strands trailing the motion.
+  vec3 dir = normalize(pos);
+  float strand = 1.0 - abs(snoise(pos*3.4 + vec3(0.0, uTime*0.45, 0.0)));
+  strand = pow(strand, 4.0);
+  float axial = 0.35 + 0.65 * abs(dir.y);
+  base += strand * axial * uTendril;
+  return base;
 }`;
 
 // ---- A small environment baked to a PMREM so the core has real,
@@ -120,7 +129,7 @@ function makeBlob(envTex) {
 
   const uniforms = {
     uTime: { value: 0 }, uFreq: { value: 1.2 }, uAmp: { value: 0.34 },
-    uMorph: { value: 0 }, uPulse: { value: 0 }, uPull: { value: 0 }, uAccent: { value: ACCENT },
+    uMorph: { value: 0 }, uPulse: { value: 0 }, uPull: { value: 0 }, uTendril: { value: 0 }, uAccent: { value: ACCENT },
   };
 
   const mat = new THREE.MeshPhysicalMaterial({
@@ -235,11 +244,16 @@ function makePoints() {
 export function initScene() {
   const canvas = document.getElementById('bg-canvas');
   if (!canvas) return;
+  const atmosphere = document.querySelector('.atmosphere');
 
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const clock = new THREE.Clock();
   const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
   let scrollN = 0, scrollTarget = 0, scrollV = 0, scrollVSigned = 0;
+  // Viscous flow driver: eases toward scroll momentum and relaxes slowly,
+  // so the venom stretch builds and releases like a thick liquid instead of
+  // snapping with raw scroll input.
+  let flow = 0;
   let lastScroll = window.scrollY;
   let renderer, scene, camera, composer, blob, blobU, points, keyLight, rimLight;
   const lightW = new THREE.Vector3();
@@ -281,6 +295,9 @@ export function initScene() {
     scrollN += (scrollTarget - scrollN) * 0.07;
     scrollV *= 0.9;
     scrollVSigned *= 0.88;
+    // Slow ease toward the (still-decaying) scroll momentum: lags going in
+    // and coming out, so the stretch oozes rather than twitches.
+    flow += (scrollVSigned - flow) * 0.045;
 
     const speed = reduceMotion ? 0 : 1;
 
@@ -303,20 +320,22 @@ export function initScene() {
 
     if (blob) {
       blobU.uTime.value = t * speed;
-      blobU.uPulse.value = scrollV * 0.45;
-      // Scroll bursts churn the surface harder — a liquid roil — right
-      // before the stretch below pulls it into a venom-like tendril.
-      blobU.uAmp.value = 0.34 - scrollN * 0.06 + scrollV * 0.4;
+      // Glow swells gently with the flow, not with raw scroll jitter — keeps
+      // the seams from strobing while scrolling.
+      const flowMag = Math.abs(flow);
+      blobU.uPulse.value = flowMag * 0.22;
+      blobU.uAmp.value = 0.34 - scrollN * 0.06;      // steady surface, no scroll churn
       blobU.uMorph.value = scrollN;                  // molten → crystalline
-      blobU.uPull.value = Math.abs(scrollVSigned);
+      blobU.uPull.value = flowMag;
+      blobU.uTendril.value = flowMag * 1.1;          // strands reach out on scroll
       blob.rotation.y = t * 0.08 * speed + pointer.x * 0.4 + scrollN * Math.PI * 1.2;
       blob.rotation.x = pointer.y * 0.3 + scrollN * 0.8;
       const bs = blob.userData.baseScale || 0.85;
       const settle = bs * (1 - scrollN * 0.18);
-      // Stretch along the scroll axis, squeeze the cross-section — the
-      // squash/stretch of a liquid mass being dragged by momentum.
-      const stretch = 1 + Math.abs(scrollVSigned) * 0.55;
-      const squeeze = 1 - Math.abs(scrollVSigned) * 0.22;
+      // Stretch along the scroll axis, squeeze the cross-section — a slow
+      // squash/stretch of a viscous mass being dragged by momentum.
+      const stretch = 1 + flowMag * 0.8;
+      const squeeze = 1 - flowMag * 0.3;
       blob.scale.set(settle * squeeze, settle * stretch, settle * squeeze);
 
       if (!isWide) {
@@ -344,6 +363,17 @@ export function initScene() {
       canvas.style.opacity = (parseFloat(canvas.style.opacity) || 1) + (targetOpacity - (parseFloat(canvas.style.opacity) || 1)) * 0.12;
     } else {
       canvas.style.opacity = 1;
+      // The dark scrim sits over the canvas and was muddying the core right
+      // at the hero — hide it there, then ease it back in once you've
+      // scrolled past so the rest of the page keeps its vignette.
+      if (atmosphere) {
+        const vh = window.innerHeight || 1;
+        const scrimTarget = Math.max(0, Math.min(1, (window.scrollY - vh * 0.35) / (vh * 0.4)));
+        const cur = parseFloat(atmosphere.dataset.op || '0');
+        const next = cur + (scrimTarget - cur) * 0.12;
+        atmosphere.dataset.op = String(next);
+        atmosphere.style.opacity = String(next);
+      }
     }
 
     if (composer) composer.render(); else renderer.render(scene, camera);
