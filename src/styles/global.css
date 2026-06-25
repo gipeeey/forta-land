@@ -377,8 +377,11 @@ img{ display:block; max-width:100%; }
 /* ---------- Misc ---------- */
 .divider{ height:1px; background:var(--line); border:0; }
 .two-col{ display:grid; grid-template-columns:1fr 1fr; gap:clamp(32px,6vw,96px); }
-@media (max-width:860px){ .two-col{ grid-template-columns:1fr; gap:40px; } }
 .sticky-col{ position:sticky; top:120px; align-self:start; }
+@media (max-width:860px){
+  .two-col{ grid-template-columns:1fr; gap:40px; }
+  .sticky-col{ position:static; top:auto; }
+}
 .tag-list{ display:flex; flex-wrap:wrap; gap:10px; }
 
 /* nav hide on mobile */

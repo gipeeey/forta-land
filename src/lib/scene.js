@@ -245,6 +245,7 @@ export function initScene() {
   const canvas = document.getElementById('bg-canvas');
   if (!canvas) return;
   const atmosphere = document.querySelector('.atmosphere');
+  const isHome = location.pathname === '/' || location.pathname === '/index.html';
 
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const clock = new THREE.Clock();
@@ -365,8 +366,9 @@ export function initScene() {
       canvas.style.opacity = 1;
       // The dark scrim sits over the canvas and was muddying the core right
       // at the hero — hide it there, then ease it back in once you've
-      // scrolled past so the rest of the page keeps its vignette.
-      if (atmosphere) {
+      // scrolled past so the rest of the page keeps its vignette. Only the
+      // home page has a hero blob to brighten; other pages keep the scrim on.
+      if (atmosphere && isHome) {
         const vh = window.innerHeight || 1;
         const scrimTarget = Math.max(0, Math.min(1, (window.scrollY - vh * 0.35) / (vh * 0.4)));
         const cur = parseFloat(atmosphere.dataset.op || '0');
