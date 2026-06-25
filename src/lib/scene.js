@@ -240,6 +240,11 @@ export function initScene() {
   let renderer, scene, camera, composer, blob, blobU, points, keyLight, rimLight;
   const lightW = new THREE.Vector3();
 
+  // Mobile-only: the blob trails behind scroll motion, then eases back to
+  // its resting spot — lagTarget is nudged by scroll delta and decays to 0
+  // each frame, lagY chases it, so the blob springs back once you stop.
+  let isWide = true, blobBaseY = 0.5, lagY = 0, lagTarget = 0;
+
   // Render budget: cap the internal pixel count regardless of how dense or
   // large the monitor is, so a 27" 2K/4K screen doesn't multiply GPU cost.
   const MAX_RENDER_PIXELS = 2.3e6;
@@ -255,12 +260,13 @@ export function initScene() {
     renderer.setPixelRatio(effectivePixelRatio(w, h));
     renderer.setSize(w, h);
     if (composer) composer.setSize(w, h);
-    const wide = w > 900;
-    blob.position.x = wide ? 2.3 : 0;
-    blob.position.y = wide ? 0.5 : 0;
+    isWide = w > 900;
+    blobBaseY = isWide ? 0.5 : -1.05;
+    blob.position.x = isWide ? 2.3 : 0;
+    blob.position.y = blobBaseY;
     // Portrait phones get a narrower horizontal FOV than the fixed vertical
     // one, so the same world-space scale reads much larger — shrink it down.
-    blob.userData.baseScale = wide ? 0.82 : 0.34;
+    blob.userData.baseScale = isWide ? 0.82 : 0.34;
   }
 
   function tick() {
@@ -292,6 +298,12 @@ export function initScene() {
       blob.rotation.x = pointer.y * 0.3 + scrollN * 0.8;
       const bs = blob.userData.baseScale || 0.85;
       blob.scale.setScalar(bs * (1 - scrollN * 0.18));
+
+      if (!isWide) {
+        lagY += (lagTarget - lagY) * 0.12;
+        lagTarget *= 0.9;
+        blob.position.y = blobBaseY + lagY;
+      }
     }
     if (points) {
       points.material.uniforms.uTime.value = t * speed;
@@ -305,10 +317,14 @@ export function initScene() {
     camera.position.z = 5.2 + scrollN * 1.4;
     camera.lookAt(blob ? blob.position.x * 0.3 : 0, 0, 0);
 
-    const vh = window.innerHeight || 1;
-    const fade = Math.max(0, Math.min(1, (window.scrollY - vh * 0.15) / (vh * 0.55)));
-    const targetOpacity = 1 - fade * 0.74;
-    canvas.style.opacity = (parseFloat(canvas.style.opacity) || 1) + (targetOpacity - (parseFloat(canvas.style.opacity) || 1)) * 0.12;
+    if (isWide) {
+      const vh = window.innerHeight || 1;
+      const fade = Math.max(0, Math.min(1, (window.scrollY - vh * 0.15) / (vh * 0.55)));
+      const targetOpacity = 1 - fade * 0.74;
+      canvas.style.opacity = (parseFloat(canvas.style.opacity) || 1) + (targetOpacity - (parseFloat(canvas.style.opacity) || 1)) * 0.12;
+    } else {
+      canvas.style.opacity = 1;
+    }
 
     if (composer) composer.render(); else renderer.render(scene, camera);
   }
@@ -357,7 +373,9 @@ export function initScene() {
   window.addEventListener('scroll', () => {
     const max = document.documentElement.scrollHeight - window.innerHeight;
     scrollTarget = max > 0 ? window.scrollY / max : 0;
-    scrollV = Math.min(Math.abs(window.scrollY - lastScroll) / 40, 1);
+    const delta = window.scrollY - lastScroll;
+    scrollV = Math.min(Math.abs(delta) / 40, 1);
+    if (!isWide) lagTarget = Math.max(-0.8, Math.min(0.8, lagTarget + delta * 0.025));
     lastScroll = window.scrollY;
   }, { passive: true });
 
