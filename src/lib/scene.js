@@ -1,16 +1,30 @@
 // ============================================================
-// FORTA — fixed 3D background
-// Fresnel-glow morphing icosahedron + drifting particles + bloom.
-// Reacts to scroll position and cursor. Imports `three` locally
-// (bundled by Astro) and is initialised lazily via initScene().
+// FORTA — "The Core" — fixed 3D background
+// A lit, reflective core that means something rather than just
+// decorates: it represents the system being built.
+//   • Image-based lighting — the surface mirrors a real
+//     environment (PBR metal + clearcoat + iridescence), so it
+//     reads like polished obsidian/liquid metal, not a flat blob.
+//   • Real recomputed normals after displacement, so reflections
+//     follow the lumpy surface.
+//   • A key light follows the cursor — point at the core and a
+//     highlight rakes across it. You shape it.
+//   • Crystallisation on scroll — molten and searching at the
+//     hero (a raw idea), resolving into a tighter, structured
+//     form as you move through the studio's process.
+//   • It illuminates the field — surrounding particles brighten
+//     on the lit side, so the scene is one lit system.
+// Imports `three` locally (bundled by Astro), initialised lazily
+// via initScene() once the page is idle.
 // ============================================================
 import * as THREE from 'three';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 
 const ACCENT = new THREE.Color(0xc8f23a);
-const DEEP = new THREE.Color(0x0a0a0b);
+const DEEP = new THREE.Color(0x06070a);
 
 // ---- Simplex noise (Ashima / Stefan Gustavson) for vertex displacement
 const NOISE_GLSL = /* glsl */ `
@@ -39,54 +53,143 @@ float snoise(vec3 v){
   return 42.0*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
 }`;
 
-function makeBlob() {
-  const geo = new THREE.IcosahedronGeometry(1.35, 64);
-  const mat = new THREE.ShaderMaterial({
-    uniforms: {
-      uTime: { value: 0 }, uAmp: { value: 0.32 }, uFreq: { value: 1.25 },
-      uAccent: { value: ACCENT }, uDeep: { value: DEEP },
-      uFres: { value: 2.6 }, uPulse: { value: 0 },
-    },
-    vertexShader: NOISE_GLSL + /* glsl */`
-      uniform float uTime, uAmp, uFreq, uPulse;
-      varying vec3 vN; varying vec3 vView; varying float vDisp;
-      void main(){
-        vec3 p = position;
-        float n = snoise(p*uFreq + vec3(0.0, uTime*0.18, uTime*0.12));
-        float n2 = snoise(p*(uFreq*2.3) + uTime*0.25)*0.4;
-        float disp = (n + n2) * (uAmp + uPulse);
-        p += normal * disp;
-        vDisp = disp;
-        vec4 mv = modelViewMatrix * vec4(p,1.0);
-        vView = normalize(-mv.xyz);
-        vN = normalize(normalMatrix * normal);
-        gl_Position = projectionMatrix * mv;
-      }`,
-    fragmentShader: /* glsl */`
-      uniform vec3 uAccent, uDeep; uniform float uFres;
-      varying vec3 vN; varying vec3 vView; varying float vDisp;
-      void main(){
-        float fres = pow(1.0 - max(dot(vN, vView), 0.0), uFres);
-        vec3 base = mix(uDeep, uDeep*1.8, smoothstep(-0.4,0.4,vDisp));
-        vec3 col = mix(base, uAccent, fres);
-        col += uAccent * pow(fres, 3.0) * 0.35;
-        gl_FragColor = vec4(col, 1.0);
-      }`,
-  });
-  return new THREE.Mesh(geo, mat);
+// Displacement shared by the position pass and the normal-recompute pass.
+const DISP_GLSL = /* glsl */ `
+uniform float uTime, uFreq, uAmp, uMorph, uPulse;
+varying float vDisp;
+float fbm(vec3 p){
+  float s = 0.0, a = 0.55, f = 1.0;
+  for(int i = 0; i < 3; i++){ s += a * snoise(p*f); f *= 2.05; a *= 0.5; }
+  return s;
+}
+float getDisp(vec3 pos){
+  vec3 q = pos*uFreq + vec3(0.0, uTime*0.16, uTime*0.11);
+  float molten = fbm(q);
+  float ridge = 1.0 - abs(snoise(q*1.7 + 3.0));
+  ridge = ridge*ridge - 0.45;
+  return mix(molten, ridge, uMorph) * (uAmp + uPulse);
+}`;
+
+// ---- A small environment baked to a PMREM so the core has real,
+// brand-tinted reflections (dark room + lime/white/warm glints).
+function makeEnv(renderer) {
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  const s = new THREE.Scene();
+
+  const sky = new THREE.Mesh(
+    new THREE.SphereGeometry(40, 32, 16),
+    new THREE.ShaderMaterial({
+      side: THREE.BackSide, depthWrite: false,
+      vertexShader: `varying vec3 vP; void main(){ vP=position; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+      fragmentShader: `varying vec3 vP;
+        void main(){
+          vec3 d = normalize(vP);
+          float y = d.y*0.5 + 0.5;
+          vec3 floorC = vec3(0.012, 0.013, 0.015);
+          vec3 topC   = vec3(0.004, 0.005, 0.006);
+          vec3 c = mix(floorC, topC, smoothstep(0.25, 0.95, y));
+          c += vec3(0.05, 0.08, 0.015) * smoothstep(0.55, 0.0, abs(y-0.35)) * 0.5; // faint lime band
+          gl_FragColor = vec4(c, 1.0);
+        }`,
+    }),
+  );
+  s.add(sky);
+
+  const glint = (hex, intensity, x, y, z, sx = 9, sy = 9) => {
+    const m = new THREE.Mesh(
+      new THREE.PlaneGeometry(sx, sy),
+      new THREE.MeshBasicMaterial({ color: new THREE.Color(hex).multiplyScalar(intensity), side: THREE.DoubleSide }),
+    );
+    m.position.set(x, y, z);
+    m.lookAt(0, 0, 0);
+    s.add(m);
+  };
+  glint(0xc8f23a, 7.0, 9, 7, 6);      // lime key
+  glint(0xeaf6ff, 4.0, -9, 4, 7, 7, 7); // cool fill
+  glint(0xffe8c0, 2.2, 3, -7, -8, 12, 12); // warm underglow
+
+  const rt = pmrem.fromScene(s, 0.04);
+  sky.geometry.dispose();
+  sky.material.dispose();
+  pmrem.dispose();
+  return rt.texture;
 }
 
-function makeHalo() {
-  const geo = new THREE.IcosahedronGeometry(1.9, 8);
-  const mat = new THREE.ShaderMaterial({
-    transparent: true, blending: THREE.AdditiveBlending, side: THREE.BackSide, depthWrite: false,
-    uniforms: { uAccent: { value: ACCENT } },
-    vertexShader: `varying vec3 vN; varying vec3 vView;
-      void main(){ vec4 mv=modelViewMatrix*vec4(position,1.0); vView=normalize(-mv.xyz); vN=normalize(normalMatrix*normal); gl_Position=projectionMatrix*mv; }`,
-    fragmentShader: `uniform vec3 uAccent; varying vec3 vN; varying vec3 vView;
-      void main(){ float f=pow(1.0-max(dot(vN,vView),0.0),3.5); gl_FragColor=vec4(uAccent, f*0.11); }`,
+function makeBlob(envTex) {
+  const geo = new THREE.IcosahedronGeometry(1.35, 32);
+
+  const uniforms = {
+    uTime: { value: 0 }, uFreq: { value: 1.2 }, uAmp: { value: 0.34 },
+    uMorph: { value: 0 }, uPulse: { value: 0 }, uAccent: { value: ACCENT },
+  };
+
+  const mat = new THREE.MeshPhysicalMaterial({
+    color: DEEP,
+    metalness: 0.92,
+    roughness: 0.28,
+    envMap: envTex,
+    envMapIntensity: 1.35,
+    clearcoat: 1.0,
+    clearcoatRoughness: 0.22,
+    iridescence: 1.0,
+    iridescenceIOR: 1.32,
+    iridescenceThicknessRange: [120, 420],
+    emissive: new THREE.Color(0x000000),
   });
-  return new THREE.Mesh(geo, mat);
+
+  mat.onBeforeCompile = (shader) => {
+    Object.assign(shader.uniforms, uniforms);
+
+    // ---- Vertex: displace the surface and recompute the normal so the
+    // reflections track the real, lumpy geometry.
+    shader.vertexShader = NOISE_GLSL + '\n' + DISP_GLSL + '\n' + shader.vertexShader;
+    shader.vertexShader = shader.vertexShader.replace(
+      '#include <beginnormal_vertex>',
+      /* glsl */`
+        float gRad = length(position);
+        vec3 gN0 = position / gRad;
+        vec3 gAx = abs(gN0.y) < 0.99 ? vec3(0.0,1.0,0.0) : vec3(1.0,0.0,0.0);
+        vec3 gTan = normalize(cross(gAx, gN0));
+        vec3 gBit = cross(gN0, gTan);
+        float gEps = 0.06;
+        vec3 gPa = normalize(position + gTan*gEps) * gRad;
+        vec3 gPb = normalize(position + gBit*gEps) * gRad;
+        float gD0 = getDisp(position);
+        vec3 gP0 = position + gN0 * gD0;
+        vec3 gPA = gPa + normalize(gPa) * getDisp(gPa);
+        vec3 gPB = gPb + normalize(gPb) * getDisp(gPb);
+        vec3 gNrm = normalize(cross(gPA - gP0, gPB - gP0));
+        if(dot(gNrm, gN0) < 0.0) gNrm = -gNrm;
+        vDisp = gD0;
+        vec3 gDispPos = gP0;
+        vec3 objectNormal = gNrm;
+        #ifdef USE_TANGENT
+        vec3 objectTangent = vec3( tangent.xyz );
+        #endif
+      `,
+    );
+    shader.vertexShader = shader.vertexShader.replace(
+      '#include <begin_vertex>',
+      'vec3 transformed = gDispPos;',
+    );
+
+    // ---- Fragment: energy emitted from the raised seams, pulsing with
+    // scroll momentum. Layered on top of the PBR reflections.
+    shader.fragmentShader =
+      'uniform vec3 uAccent; uniform float uPulse;\nvarying float vDisp;\n' + shader.fragmentShader;
+    shader.fragmentShader = shader.fragmentShader.replace(
+      '#include <emissivemap_fragment>',
+      /* glsl */`
+        #include <emissivemap_fragment>
+        float seam = smoothstep(0.12, 0.52, vDisp);
+        totalEmissiveRadiance += uAccent * seam * (0.35 + uPulse * 2.2);
+      `,
+    );
+  };
+
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.userData.uniforms = uniforms;
+  return mesh;
 }
 
 function makePoints() {
@@ -107,14 +210,20 @@ function makePoints() {
   geo.setAttribute('aRnd', new THREE.BufferAttribute(rnd, 1));
   const mat = new THREE.ShaderMaterial({
     transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
-    uniforms: { uTime: { value: 0 }, uAccent: { value: ACCENT } },
-    vertexShader: `uniform float uTime; attribute float aRnd; varying float vR;
+    uniforms: {
+      uTime: { value: 0 }, uAccent: { value: ACCENT },
+      uLightW: { value: new THREE.Vector3(0.4, 0.5, 0.8).normalize() },
+    },
+    vertexShader: `uniform float uTime; uniform vec3 uLightW; attribute float aRnd; varying float vR; varying float vLit;
       void main(){ vR=aRnd; vec3 p=position; p.y+=sin(uTime*0.3+aRnd*6.28)*0.3;
+        vLit = max(dot(normalize(position), uLightW), 0.0);
         vec4 mv=modelViewMatrix*vec4(p,1.0); gl_PointSize=(aRnd*1.1+0.5)*(110.0/-mv.z); gl_Position=projectionMatrix*mv; }`,
-    fragmentShader: `varying float vR; uniform vec3 uAccent;
+    fragmentShader: `varying float vR; varying float vLit; uniform vec3 uAccent;
       void main(){ vec2 c=gl_PointCoord-0.5; float d=dot(c,c); if(d>0.25) discard;
         float a=smoothstep(0.25,0.0,d);
-        vec3 col=mix(vec3(0.55), uAccent*0.8, step(0.8,vR)); gl_FragColor=vec4(col, a*(0.08+vR*0.13)); }`,
+        vec3 col=mix(vec3(0.5), uAccent*0.85, step(0.8,vR));
+        col=mix(col, uAccent, vLit*0.55);
+        gl_FragColor=vec4(col, a*(0.07+vR*0.12+vLit*0.07)); }`,
   });
   return new THREE.Points(geo, mat);
 }
@@ -128,16 +237,27 @@ export function initScene() {
   const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
   let scrollN = 0, scrollTarget = 0, scrollV = 0;
   let lastScroll = window.scrollY;
-  let renderer, scene, camera, composer, blob, halo, points;
+  let renderer, scene, camera, composer, blob, blobU, points, keyLight, rimLight;
+  const lightW = new THREE.Vector3();
+
+  // Render budget: cap the internal pixel count regardless of how dense or
+  // large the monitor is, so a 27" 2K/4K screen doesn't multiply GPU cost.
+  const MAX_RENDER_PIXELS = 2.3e6;
+  function effectivePixelRatio(w, h) {
+    const dpr = Math.min(window.devicePixelRatio, 2);
+    const scale = Math.sqrt(MAX_RENDER_PIXELS / (w * h * dpr * dpr));
+    return dpr * Math.min(1, scale);
+  }
 
   function resize() {
     const w = window.innerWidth, h = window.innerHeight;
     camera.aspect = w / h; camera.updateProjectionMatrix();
+    renderer.setPixelRatio(effectivePixelRatio(w, h));
     renderer.setSize(w, h);
     if (composer) composer.setSize(w, h);
     const wide = w > 900;
-    blob.position.x = halo.position.x = wide ? 2.3 : 0;
-    blob.position.y = halo.position.y = wide ? 0.5 : 0;
+    blob.position.x = wide ? 2.3 : 0;
+    blob.position.y = wide ? 0.5 : 0;
     blob.userData.baseScale = wide ? 0.82 : 0.92;
   }
 
@@ -151,20 +271,29 @@ export function initScene() {
 
     const speed = reduceMotion ? 0 : 1;
 
+    // Key light: slowly orbits the core and is pulled toward the cursor,
+    // so a highlight rakes across the surface where you point.
+    const ang = t * 0.22 * speed;
+    lightW.set(
+      Math.cos(ang) * 0.7 + pointer.x * 0.9,
+      0.45 - pointer.y * 0.7,
+      0.6 + Math.sin(ang * 0.6) * 0.35,
+    ).normalize();
+    if (keyLight) keyLight.position.copy(blob.position).addScaledVector(lightW, 6);
+
     if (blob) {
-      blob.material.uniforms.uTime.value = t * speed;
-      blob.material.uniforms.uPulse.value = scrollV * 0.5;
-      blob.material.uniforms.uAmp.value = 0.30 + scrollN * 0.22;
+      blobU.uTime.value = t * speed;
+      blobU.uPulse.value = scrollV * 0.45;
+      blobU.uAmp.value = 0.34 - scrollN * 0.06;     // calms as it resolves
+      blobU.uMorph.value = scrollN;                  // molten → crystalline
       blob.rotation.y = t * 0.08 * speed + pointer.x * 0.4 + scrollN * Math.PI * 1.2;
       blob.rotation.x = pointer.y * 0.3 + scrollN * 0.8;
       const bs = blob.userData.baseScale || 0.85;
-      const s = bs * (1 - scrollN * 0.18);
-      blob.scale.setScalar(s);
-      halo.rotation.copy(blob.rotation);
-      halo.scale.setScalar(s * 1.04);
+      blob.scale.setScalar(bs * (1 - scrollN * 0.18));
     }
     if (points) {
       points.material.uniforms.uTime.value = t * speed;
+      points.material.uniforms.uLightW.value.copy(lightW);
       points.rotation.y = t * 0.02 * speed + pointer.x * 0.15;
       points.rotation.x = -scrollN * 0.4;
     }
@@ -182,23 +311,38 @@ export function initScene() {
     if (composer) composer.render(); else renderer.render(scene, camera);
   }
 
-  renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true, powerPreference: 'high-performance' });
+  renderer.setPixelRatio(effectivePixelRatio(window.innerWidth, window.innerHeight));
   renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.05;
 
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.1, 100);
   camera.position.set(0, 0, 5.2);
 
-  blob = makeBlob();
-  halo = makeHalo();
+  const envTex = makeEnv(renderer);
+  scene.environment = envTex;
+
+  blob = makeBlob(envTex);
+  blobU = blob.userData.uniforms;
   points = makePoints();
-  scene.add(blob, halo, points);
+  scene.add(blob, points);
+
+  // A moving key light (cursor-driven) for a live specular, plus a steady
+  // lime rim from behind so the core never goes fully dark.
+  keyLight = new THREE.PointLight(0xfff4e0, 60, 0, 2);
+  scene.add(keyLight);
+  rimLight = new THREE.DirectionalLight(ACCENT, 1.4);
+  rimLight.position.set(-4, 2, -5);
+  scene.add(rimLight);
+  scene.add(new THREE.AmbientLight(0x223044, 0.6));
 
   try {
     composer = new EffectComposer(renderer);
     composer.addPass(new RenderPass(scene, camera));
-    composer.addPass(new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.42, 0.5, 0.78));
+    composer.addPass(new UnrealBloomPass(new THREE.Vector2(window.innerWidth / 2, window.innerHeight / 2), 0.5, 0.45, 0.85));
+    composer.addPass(new OutputPass());
   } catch (e) {
     composer = null;
   }

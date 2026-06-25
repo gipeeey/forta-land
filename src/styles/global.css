@@ -89,7 +89,7 @@ img{ display:block; max-width:100%; }
   letter-spacing:-0.03em;
   text-wrap:balance;
 }
-.h-xxl{ font-size:clamp(3rem, 11vw, 11rem); }
+.h-xxl{ font-size:clamp(2.5rem, 7vw, 6.5rem); }
 .h-xl{ font-size:clamp(2.6rem, 7.5vw, 6.5rem); }
 .h-lg{ font-size:clamp(2rem, 5vw, 4rem); }
 .h-md{ font-size:clamp(1.5rem, 3vw, 2.6rem); }
