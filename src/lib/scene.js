@@ -258,7 +258,9 @@ export function initScene() {
     const wide = w > 900;
     blob.position.x = wide ? 2.3 : 0;
     blob.position.y = wide ? 0.5 : 0;
-    blob.userData.baseScale = wide ? 0.82 : 0.92;
+    // Portrait phones get a narrower horizontal FOV than the fixed vertical
+    // one, so the same world-space scale reads much larger — shrink it down.
+    blob.userData.baseScale = wide ? 0.82 : 0.34;
   }
 
   function tick() {
